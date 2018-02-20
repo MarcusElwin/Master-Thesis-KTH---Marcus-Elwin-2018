@@ -6,6 +6,28 @@
 \usepackage{biblatex}
 \addbibresource{references.bib} % The file containing our references, in BibTeX format
 
+%added by me:
+\usepackage{xcolor}
+\usepackage{color}
+\usepackage{amsmath,float}
+\usepackage{caption}
+\captionsetup[figure]{labelfont=bf}
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{hyp}{Hypothesis}
+\newtheorem{RQ}{Research Question}[section]
+
+%for clickable hyperlinks
+%colors for different links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
 
 \title{Deep reinforcement learning and competitive self-playing agents used in the Nordic stock market, to understand trading dynamics}
 \alttitle{Detta är den svenska översättningen av titeln}
@@ -13,7 +35,7 @@
 \email{elwi@kth.se}
 \supervisor{Hamid Reza Faragardi}
 \examiner{Lennart Bladgren}
-\programme{Master in Machine Learning}
+\programme{Master of Science in Machine Learning}
 \school{School of Electrical Engineering and Computer Science}
 \date{\today}
 
@@ -34,12 +56,7 @@
 
 \begin{otherlanguage}{swedish}
   \begin{abstract}
-    Träutensilierna i ett tryckeri äro ingalunda en oviktig faktor,
-    för trevnadens, ordningens och ekonomiens upprätthållande, och
-    dock är det icke sällan som sorgliga erfarenheter göras på grund
-    af det oförstånd med hvilket kaster, formbräden och regaler
-    tillverkas och försäljas Kaster som äro dåligt hopkomna och af
-    otillräckligt.
+    Svensk sammanfattning
   \end{abstract}
 \end{otherlanguage}
 
@@ -59,15 +76,56 @@ command \texttt{parencite} to get a reference in parenthesis, like this
 as part of the sentence using \texttt{textcite}, like talking about
 the work of \textcite{einstein2016}.
 
-\Blindtext
+\section{Background}
 
+%need to work with
 \section{Research Question}
+The research question for this thesis can be divided in to two parts:
 
-\blindtext
+\begin{RQ}
+Will trading dynamics such as the bid-ask spread clustering, optimal trade execution and optimal inventory costs exhibited \& learned by reinforcement learning agents using competitive self-play.
+\end{RQ}
+
+\begin{RQ}
+By using competitive self-play will the agents learn any new complex behavior on the simulated Nordic stock market consisting of market makers and high-frequency algorithmic traders? And how will the agents react to changed market conditions?
+\end{RQ}
+
+ 
+
+
+
+\section{Problem}
+
+\section{Aim}
+
+\section{Objective}
+
+\section{Delimitation}
+
+\section{Disposition}
+
+%The student displays knowledge of theoretical background and previous related work (significant literature is mentioned and relevant material is used).
+
+The background is coherent and relevant.
+\chapter{Background}
+In this chapter relevant theory is presented in order to give the reader a good overview of the fields study during the pre-study that are relevant for the thesis. We begin with .. and finally end with a section on previous related work.
+
+\section{Market Microstructure}
+
+\section{Reinforcement Learning}
+
+\section{Tree Search}
+
+\section{Related Work}
+
 
 \chapter{Methods}
 
-\blindtext
+\chapter{Experiments}
+
+\chapter{Results}
+
+\chapter{Discussion \& Conclusions}
 
 \printbibliography[heading=bibintoc] % Print the bibliography (and make it appear in the table of contents)
 
