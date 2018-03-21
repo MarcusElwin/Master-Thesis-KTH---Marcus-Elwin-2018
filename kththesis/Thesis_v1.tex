@@ -18,6 +18,8 @@
 \newtheorem{hyp}{Hypothesis}
 \newtheorem{RQ}{Research Question}[section]
 
+\usepackage{graphicx}
+
 %for clickable hyperlinks
 %colors for different links
 \usepackage{hyperref}
@@ -28,20 +30,25 @@
     urlcolor={blue!80!black}
 }
 
+\usepackage{cleveref}
 
-\title{Deep reinforcement learning and competitive self-playing agents used in the Nordic stock market, to understand trading dynamics}
+\graphicspath{{Imgs/}}
 
-\alttitle{Detta är den svenska översättningen av titeln}
+\title{Competitive self-playing reinforcement learning agents used in the Nordic stock market, to understand market microstructure}
+
+\alttitle{Reinforcement learning agenter i den nordiska aktiemarknaden, för att förstå marknadens mikrostruktur }
 \author{Marcus Elwin}
 \email{elwi@kth.se}
 \supervisor{Hamid Reza Faragardi}
-\examiner{Lennart Bladgren}
+\examiner{Elena Troubitsyna}
 \programme{Master of Science in Machine Learning}
 \school{School of Electrical Engineering and Computer Science}
 \date{\today}
 
 
+
 \begin{document}
+
 
 % Frontmatter includes the titlepage, abstracts and table-of-contents
 \frontmatter
@@ -51,7 +58,6 @@
 \begin{abstract}
   English abstract goes here.
 
-  \blindtext
 \end{abstract}
 
 
@@ -71,25 +77,38 @@
 
 \chapter{Introduction}
 
-We use the \emph{biblatex} package to handle our references.  We therefore use the
-command \texttt{parencite} to get a reference in parenthesis, like this
-\parencite{heisenberg2015}.  It is also possible to include the author
-as part of the sentence using \texttt{textcite}, like talking about
-the work of \textcite{einstein2016}.
+%We use the \emph{biblatex} package to handle our references.  We therefore use the
+%command \texttt{parencite} to get a reference in parenthesis, like this
+%\parencite{heisenberg2015}.  It is also possible to include the author
+%as part of the sentence using \texttt{textcite}, like talking about
+%the work of \textcite{einstein2016}.
 
 \section{Background}
+Modern financial markets such as NASDAQ, CME and NYSE have all been effected by the rise and presence of \textit{Algorithmic Trading} and \textit{High-Frequency Trading} (HFT).  Where both types of trading consists in using computer programs to implement investment and trading strategies \parencite{abergel2012market}. These types of strategies have according to \textcite{abergel2012market, o2015high} raised various questions about there effects on the financial markets. Mainly in areas as: \textit{liquidity, volatility, price discovery, systematic risk, manipulation} and \textit{market organization}. Where a quite recent example of the proposed effect of algorithmic trading and HFT on financial markets is \textit{the Flash Crash} in the 6th of May 2010. Where in the course of 30 minutes U.S. stock market indices, stock-index futures, options, and exchange-traded funds. Experienced a sudden price drop of more than five percent,followed by a rapid rebound \parencite{kirilenko2011flash,kirilenko2017flash}. See an illustration of this in \autoref{fig:1}.
+\newline
+\newline
+Trading in the financial market can be seen as a search problem, which depends on market structure \parencite{abergel2012market}. \textit{Market microstructure} is a branch of economics, where one tries to understand trading dynamics on the financial market on a micro level \parencite{o1995market, hasbrouck2007empirical}. Market microstructure theory is used by regulators, traders and organizers of financial markets. in order to make a profit or create more transparent and efficient markets. Where a recent regulation with the purpose of making markets more transparent and efficient is \textit{Markets in Financial Instruments Directive} (MiFID) II \parencite{busch2016mifid}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=.7]{flashcrash.PNG}
+    \caption{Minute-by-minute transaction prices and trading volume on E-mini S\& P futures contracts during the flash crash, between 8:30 to 15:15. Notice the distinct drop and rebound at the end of the day. Source: \textcite{kirilenko2017flash} }
+    \label{fig:1}
+\end{figure}
+
+However as mentioned by \textcite{o2015high} due to HFT and algoritmic trading. Learning models and empirical models used in market microstructure in the past are deficient and may not longer be appropriate. Which calls for the use of new more capable methods. Where \textit{Reinforcement Learning} and other machine learning methods are of great interest. Machine learning and AI has been used in a financial setting for some time, and has become ubiquitous in finance today. Mainly due to the abundance of available data and computing power. 
+\newline
+\newline
+Where recent achievements for the use of Reinforcement Learning has been seen in the game Go with \textit{AlphaGo, AlphaGoZero} \parencite{silver2016mastering} programs being able to win over esteemed Go champions. More complicated strategic games as Star Craft has also seen succesfull applications of reinforcment learning \parencite{vinyals2017starcraft}. Therefore the focus of this thesis will be to examine the possibility of using deep reinforcement learning and competitive self-play. In order to understand the market microstructure on a simulated Nordic stock market.
 
 %need to work with
 \section{Research Question}
-The research question for this thesis can be divided in to two parts:
+The research question for this thesis is shown below:
 
 \begin{RQ}
-Will trading dynamics such as the bid-ask spread clustering, optimal trade execution and optimal inventory costs exhibited \& learned by reinforcement learning agents using competitive self-play.
+Will trading dynamics such as the bid-ask spread clustering, optimal trade execution and optimal inventory costs be exhibited \& learned by reinforcement learning agents using competitive self-play on a simulated Nordic stock market.
 \end{RQ}
 
-\begin{RQ}
-By using competitive self-play will the agents learn any new complex behavior on the simulated Nordic stock market consisting of market makers and high-frequency algorithmic traders? And how will the agents react to changed market conditions?
-\end{RQ}
 
  
 
@@ -115,7 +134,9 @@ In this chapter relevant theory is presented in order to give the reader a good 
 \section{Modern Financial Markets}
 
 \subsection{Participants}
-Looking at the financial markets today \textcite{cartea2015algorithmic} broadly categories three primary classes of traders (or strategies) that partake in the market:
+A \textit{market} is the place where traders gather to trade \parencite{harris2003trading} different types of instruments as common stocks, bonds, futures, options, derivatives and foreign exchange rates just to mention a few.
+Looking at today's financial markets
+\textcite{cartea2015algorithmic} broadly categories three primary classes of traders (or strategies) that partake in the market:
 \begin{itemize}
     \item \textbf{Fundamental traders:} those who are driven by economic fundamentals outside the exchange.
     \item \textbf{Informed traders:} traders who profit from leveraging information not reflected in market prices and trading assets in the hope of their increase or decrease in value.
@@ -127,13 +148,38 @@ One common measure to characterize financial markets are \textit{liquidity}. Liq
 
 \subsection{Orderbook}
 
+%mention what it is, some strategies, and how it effect modern markets
 \subsection{Algorithmic and High-Frequency Trading}
+High frequency trading is a term used to describe a large diverse set of activities and behaviors \parencite{o2015high}. Where some of the main characteristics for high frequency traders are: (i) use of \textit{high-speed} and sophisticated programs for \textit{generating, executing} and \textit{routing} orders, (ii) use of \textit{co-location} to minimize \textit{latency}, (iii) very short time frames for their positions, (iv) submission of numerous orders that are cancelled shortly and (v) ending the day with almost flat positions.
 
+%Ho stoll model for invetory market
 
+%GM
+
+% Daz model for informed traders
+
+% Real market with matching engine e.g. parity
 \section{Market Microstructure}
-Market microstructure is the study of the process and outcomes of exchanging assets under implicit trading rules as mentioned in\textcite{o1995market}
+\textit{Market microstructure} is the study of the process and outcomes of exchanging assets under implicit trading rules as mentioned in\textcite{o1995market}
+
+\section{Artificial Financial Markets}
+
 
 \section{Reinforcement Learning}
+
+\subsection{The Main Concepts}
+Reinforcement learning (RL) is learning what to do i.e. map situations to actions, in order to maximize a numerical reward function \parencite{sutton1998reinforcement}. Which is quite different from other machine learning methods based on \textit{supervised} or \textit{unsupervised} learning, where one in fact have the true labels or not.
+
+\subsection{Exploration versus Exploitation}
+In reinforcement learning we have a trade-off between \textit{exploration} and \textit{exploitation}. Where exploration refers to taking actions, that come from the current best version of the learned policy. Exploration instead is concerned with taking more actions to obtain more training data \parencite{goodfellow2016deep}. Where the dilemma is that neither exploration nor exploitation can be pursued exclusively without failing at the task \parencite{sutton1998reinforcement}.
+
+\subsection{Algorithms \& Learning in RL}
+One can characterize RL problems into two main classes: \textit{prediction} and \textit{control} where each is followed by different approaches as \textit{value iteration, policy iteration} and \textit{policy search} \parencite{szepesvari2009algorithms}. These different approaches uses different algorithms 
+
+\subsection{Competitive Self-Play}
+
+%mention where it has been succesfully used and show the need of the application that we want to use here for the thesis
+\subsection{Reinforcement Learning in Market Microstructure}
 
 
 %necessary?
@@ -143,6 +189,7 @@ Market microstructure is the study of the process and outcomes of exchanging ass
 
 \subsection{Monte Carlo Tree Search (MCTS)}
 
+%own chapter?
 \section{Related Work}
 
 
