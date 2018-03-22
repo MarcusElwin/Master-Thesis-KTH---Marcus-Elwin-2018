@@ -20,6 +20,7 @@
 
 \usepackage{graphicx}
 
+
 %for clickable hyperlinks
 %colors for different links
 \usepackage{hyperref}
@@ -87,7 +88,7 @@
 Modern financial markets such as NASDAQ, CME and NYSE have all been effected by the rise and presence of \textit{Algorithmic Trading} and \textit{High-Frequency Trading} (HFT).  Where both types of trading consists in using computer programs to implement investment and trading strategies \parencite{abergel2012market}. These types of strategies have according to \textcite{abergel2012market, o2015high} raised various questions about there effects on the financial markets. Mainly in areas as: \textit{liquidity, volatility, price discovery, systematic risk, manipulation} and \textit{market organization}. Where a quite recent example of the proposed effect of algorithmic trading and HFT on financial markets is \textit{the Flash Crash} in the 6th of May 2010. Where in the course of 30 minutes U.S. stock market indices, stock-index futures, options, and exchange-traded funds. Experienced a sudden price drop of more than five percent,followed by a rapid rebound \parencite{kirilenko2011flash,kirilenko2017flash}. See an illustration of this in \autoref{fig:1}.
 \newline
 \newline
-Trading in the financial market can be seen as a search problem, which depends on market structure \parencite{abergel2012market}. \textit{Market microstructure} is a branch of economics, where one tries to understand trading dynamics on the financial market on a micro level \parencite{o1995market, hasbrouck2007empirical}. Market microstructure theory is used by regulators, traders and organizers of financial markets. in order to make a profit or create more transparent and efficient markets. Where a recent regulation with the purpose of making markets more transparent and efficient is \textit{Markets in Financial Instruments Directive} (MiFID) II \parencite{busch2016mifid}.
+Trading in the financial market can be seen as a search problem where buyers and sellers search for each-other. Which depends on market structure \parencite{abergel2012market}. \textit{Market microstructure} is a branch of economics, where one tries to understand trading dynamics on the financial market on a micro level \parencite{o1995market, hasbrouck2007empirical}. Market microstructure theory is used by regulators, traders and organizers of financial markets. In order to make a profit or create more transparent and efficient markets. Where a recent regulation with the purpose of making markets more transparent and efficient is \textit{Markets in Financial Instruments Directive} (MiFID) II \parencite{busch2016mifid}.
 
 \begin{figure}[ht]
     \centering
@@ -99,7 +100,7 @@ Trading in the financial market can be seen as a search problem, which depends o
 However as mentioned by \textcite{o2015high} due to HFT and algoritmic trading. Learning models and empirical models used in market microstructure in the past are deficient and may not longer be appropriate. Which calls for the use of new more capable methods. Where \textit{Reinforcement Learning} and other machine learning methods are of great interest. Machine learning and AI has been used in a financial setting for some time, and has become ubiquitous in finance today. Mainly due to the abundance of available data and computing power. 
 \newline
 \newline
-Where recent achievements for the use of Reinforcement Learning has been seen in the game Go with \textit{AlphaGo, AlphaGoZero} \parencite{silver2016mastering} programs being able to win over esteemed Go champions. More complicated strategic games as Star Craft has also seen succesfull applications of reinforcment learning \parencite{vinyals2017starcraft}. Therefore the focus of this thesis will be to examine the possibility of using deep reinforcement learning and competitive self-play. In order to understand the market microstructure on a simulated Nordic stock market.
+Where recent achievements for the use of Reinforcement Learning has been seen in the game Go with \textit{AlphaGo, AlphaGoZero} \parencite{silver2016mastering} programs being able to win over esteemed Go champions. More complicated strategic games as Star Craft has also seen successful application of reinforcement learning \parencite{vinyals2017starcraft}. Therefore the focus of this thesis will be to examine the possibility of using deep reinforcement learning and competitive self-play. In order to understand the market microstructure on a simulated Nordic stock market.
 
 %need to work with
 \section{Research Question}
@@ -109,18 +110,29 @@ The research question for this thesis is shown below:
 Will trading dynamics such as the bid-ask spread clustering, optimal trade execution and optimal inventory costs be exhibited \& learned by reinforcement learning agents using competitive self-play on a simulated Nordic stock market.
 \end{RQ}
 
-
- 
-
-
-
 \section{Problem}
+With more granular and high frequency data as well as more sophisticated trading algorithms. The financial markets has become harder to understand during the past decade. Traditional methods used in market microstructure might have become obsolete as mentioned in \textcite{o2015high}. A traditional supervised learning approach is not of use for this thesis. Due to the fact of the financial markets dynamic nature as a complex system. The agents must be able to adapt and dynamically learn optimal behaviour.  Therefore the problem in this thesis is to understand by using reinforcement learning, specially learning via competitive self-play. On a simulated Nordic stock market. 
+\newline
+\newline
+If common market microstructure trading dynamics such as \textit{bid-ask spread clustering, optimal trade execution} and \textit{optimal inventory costs} as described in \textcite{o1995market}. Will be exhibited and understood by the reinforcement learning agents. Also it is of interest to see what happens with the agents when changing the market conditions. Much like what is happening in the real markets. For example changing the number of participants, order sizes, prices and trading rules.
 
-\section{Aim}
+%\section{Aim}
+
+%\newpage
 
 \section{Objective}
+The objective for this thesis is two-fold. Firstly in the case of the principal the objective is to have a functional and working exchange simulator (EXSIM). Where they can change different parameters, policies, reward functions and other things effecting the market. In order to study and simulate modern financial markets on a microscopic level. Secondly from the thesis point of view, the objective is to investigate the following:
+
+\begin{itemize}
+    \item Can competitive self-play and reinforcement learning be successfully used in a financial setting. 
+    \item Can new insight and applications be provided to the the growing field of market microstructure. 
+    \item Can reinforcement learning work in more complicated environments such as the financial market.
+\end{itemize}
+
 
 \section{Delimitation}
+
+\section{The principle}
 
 \section{Disposition}
 
@@ -131,26 +143,7 @@ The background is coherent and relevant.
 In this chapter relevant theory is presented in order to give the reader a good overview of the fields study during the pre-study that are relevant for the thesis. We begin with .. and finally end with a section on previous related work.
 
 %Necessary
-\section{Modern Financial Markets}
-
-\subsection{Participants}
-A \textit{market} is the place where traders gather to trade \parencite{harris2003trading} different types of instruments as common stocks, bonds, futures, options, derivatives and foreign exchange rates just to mention a few.
-Looking at today's financial markets
-\textcite{cartea2015algorithmic} broadly categories three primary classes of traders (or strategies) that partake in the market:
-\begin{itemize}
-    \item \textbf{Fundamental traders:} those who are driven by economic fundamentals outside the exchange.
-    \item \textbf{Informed traders:} traders who profit from leveraging information not reflected in market prices and trading assets in the hope of their increase or decrease in value.
-    \item \textbf{Market Makers:} professional trader who profit from facilitating exchange in a particular asset and exploit their skills in executing trades.
-\end{itemize}
-
-\subsection{Liquidity}
-One common measure to characterize financial markets are \textit{liquidity}. Liquidity impounds the usual economic concept of \textit{elasticity}, and liquidity is sometimes defined as 'depth, breadth and resiliency' \parencite{hasbrouck2007empirical}.
-
-\subsection{Orderbook}
-
-%mention what it is, some strategies, and how it effect modern markets
-\subsection{Algorithmic and High-Frequency Trading}
-High frequency trading is a term used to describe a large diverse set of activities and behaviors \parencite{o2015high}. Where some of the main characteristics for high frequency traders are: (i) use of \textit{high-speed} and sophisticated programs for \textit{generating, executing} and \textit{routing} orders, (ii) use of \textit{co-location} to minimize \textit{latency}, (iii) very short time frames for their positions, (iv) submission of numerous orders that are cancelled shortly and (v) ending the day with almost flat positions.
+%\section{Modern Financial Markets}
 
 %Ho stoll model for invetory market
 
@@ -160,10 +153,121 @@ High frequency trading is a term used to describe a large diverse set of activit
 
 % Real market with matching engine e.g. parity
 \section{Market Microstructure}
-\textit{Market microstructure} is the study of the process and outcomes of exchanging assets under implicit trading rules as mentioned in\textcite{o1995market}
+\textit{Market microstructure} is the study of the process and outcomes of exchanging assets under implicit trading rules as mentioned in \textcite{o1995market}. A lot of market microstructure research according to \textcite{madhavan2000market} are concerned with : 
+\begin{enumerate}
+    \item \textit{Price formation and discovery} i.e. looking in to the black box of the market by which latent demands are translated into prices.
+    \item \textit{Market structure and design} i.e. what different rules effect the black box of the market.
+    \item \textit{Information and disclosure} i.e. how the workings of the black box affects the behaviour of traders and strategies.
+\end{enumerate}
+All of these will be covered in this section.
+
+%\newpage
+
+\subsection{Market Participants}
+A \textit{market} is the place where traders gather to trade \parencite{harris2003trading} different types of instruments as common stocks, bonds, futures, options, derivatives and foreign exchange rates just to mention a few.
+Looking at today's financial markets
+\textcite{cartea2015algorithmic} broadly categories three primary classes of traders (or strategies) that partake in the market:
+\begin{itemize}
+    \item \textbf{Fundamental traders:} those who are driven by economic fundamentals outside the exchange.
+    \item \textbf{Informed traders:} traders who profit from leveraging information not reflected in market prices and trading assets in the hope of their increase or decrease in value.
+    \item \textbf{Market Makers:} professional trader who profit from facilitating exchange in a particular asset and exploit their skills in executing trades.
+\end{itemize}
+
+\subsection{Trading Mechanisms}
+Any trading mechanism can be seen as a type of trading game in which players meet virtually or physical at some venue and act according to some rules \parencite{o1995market}. Where the players are some of the participants mentioned in the previous section. The venue or the market is trades are actually happening which can be on an exchange or via other intermediaries. A common division of market structure is presented in \textcite{foucault2013market} \textit{the limit order market} (auction market) and \textit{the dealer market}. In fact all trading mechanisms can be viewed as a variation of these \parencite{foucault2013market}.
+\newline
+\newline
+In limited order markets, the final investors interact directly; there bids and offers are accumulated in the \textit{limited order book} (LOB). By price priority and secondly time priority \parencite{hasbrouck2007empirical}. Whilst in dealer markets participants can only trade at the bid and ask quotes posted by specialized intermediaries i.e. \textit{dealers} or \textit{market makers} \parencite{foucault2013market}. Note that the LOB is very dynamic as it constitutes of \textit{limit orders}\footnote{A limit order is an order that specifies a direction, quantity and acceptable price.}. Which can be cancelled or modified at any time, thus the LOB can change be changed extremely rapid \parencite{hasbrouck2007empirical}. An example of a limit order book is shown below in \autoref{fig:2}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.65]{LOBex.PNG}
+    \caption{Snapshot of the LOB for the ticker ORCL (Oracle) after the 10 000th event during that day. Blue bars indicates sell limit orders, whilst red bars are buy limit orders.}
+    \label{fig:2}
+\end{figure}
+Market orders are other types of orders found on LOB markets, which are usually considered to be more aggressive. This as they seek to execute a trade immediately \parencite{cartea2015algorithmic}. For instance if a market order is placed and the quantity is larger then quantity available in the book. The order is \textit{re-routed} or sad to 'walk the book' until the order is filled \parencite{hasbrouck2007empirical,cartea2015algorithmic}.To make things more complicated modern markets has a lot of different order types. Such as \textit{hidden, reserved, iceburg} and \textit{Fill-or-Kill} orders just to mention a few. Where \parencite{foucault2013market, cartea2015algorithmic, hasbrouck2007empirical} gives a good overview of these. There also exist \textit{hybrid markets} which are traditional quote-driven markets as Nasdaq and London Stock Exchange (LSE) \parencite{foucault2013market}.
+
+\subsection{Price Formation \& Discovery}
+The mechanism of price formation is at the very heart of economics.  Which is also important to understand 'stylized facts' in financial price series as \textit{heavy tails} and \textit{volatility clustering}  \parencite{abergel2012market}. \text{Price discovery} is the speed and accuracy with which transactions prices incorporate information available to market participants \parencite{foucault2013market}. In fact market makers, professional traders who stand willing to buy or sell securities. Is a logical starting point for how prices are actually determined in the market \parencite{madhavan2000market}. Another key is also the role of information and who has it, that will be covered more in section .. \parencite{cartea2015algorithmic}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{bidask.png}
+    \caption{Three components of bid-ask spread in short-term and lon-term response to a market buy order. Source: \textcite{foucault2013market}}
+    \label{fig:3}
+\end{figure}
+
+\subsubsection*{Bid-Ask Spread}
+
+The bid-ask spread is usually decomposed into three components: \textit{adverse selection, order-processing costs} and \textit{inventory holding costs} \parencite{foucault2013market}. Order processing costs, consists of the setup price and operating costs of trading. Inventory costs is cost associated with carrying inventory. Adverse selection costs are costs that arise because some traders are more informed then others. When trading with these \textit{informed traders}, market makers will on average lose money \parencite{darley2007nasdaq}. Therefore a fraction of the bid-ask spread can be seen as a compensation for having to trade against informed traders \parencite{darley2007nasdaq}.In \autoref{fig:3} above these are illustrated on a short-term and long-term perspective.
+\newline
+\newline
+Market makers quote two prices the bid price and the ask price where the difference between these is the market makers \textit{spread} \parencite{madhavan2000market}. By doing this market makers are also providing \textit{liquidity} to the market. Spreads measure the execution cost of small transaction, by measuring how close the price of a trade is to the \textit{market price}. Where the market price is the \textit{equilibrium price} i.e. the price where demand equals supply \parencite{cartea2015algorithmic}. One approach is by using the \textit{midprice} in \autoref{eq:1}:
+
+\begin{equation}
+    \label{eq:1}
+    S_{t} = \frac{1}{2}(a_t + b_t)
+\end{equation}
+Which is the simple average of the bid ($b_t$) and ask($a_t$) price.
+However the most common spread measures are the \textit{quoted} and the \textit{effective} \parencite{cartea2015algorithmic, foucault2013market} spread both shown in \autoref{eq:2} and \autoref{eq:3}
+
+\begin{equation}
+    \label{eq:2}
+    QS_t = a_t - b_t
+\end{equation}
+
+\begin{equation}
+    \label{eq:3}
+    ES_t = a_t - S_t \text{ or } ES_t = S_t - b_t
+\end{equation}
+The quoted spread represents the potential cost of immediacy at any point in time as well as the distance from the market price \parencite{cartea2015algorithmic}. As mentioned in \textcite{foucault2013market} the quoted spread is also a good measure of trading costs for small orders used for measuring liquidity. If we normalize \autoref{eq:2} with the mid price we get the \textit{relative quoted spread} 
+
+\begin{equation*}
+    RQS_t = \frac{a_t - b_t}{S_t}.
+\end{equation*}
+Another related measure is the so called \textit{relative weighted average bid-ask spread} (RTWAS):
+
+\begin{equation}
+\label{eq:4}
+    RTWAS_{t} = \frac{\bar{a}(q) - \bar{b}(q)}{S_t}
+\end{equation}
+Where $\bar{a}(q)$ and $\bar{b}(q)$ is the average execution price for buy and sell market orders of size $q$ \parencite{foucault2013market}. On the other hand the effective spread or half-spread measures the realized difference between the price paid and the midprice. Which can also be negative indicating that one is buying at a price below or selling above the 'market price' \parencite{cartea2015algorithmic}. ES and QS differ in the fact that ES can only be measured when there is a trade while QS are always observable \parencite{cartea2015algorithmic}.
+
+Some stylized facts know about the bid-ask spread are:
+\begin{itemize}
+    \item item 1
+    \item item 2
+\end{itemize}
+
+\subsubsection*{Liquidity}
+If the structure of a securities market is compared to a car design, measuring liquidity is like assessing the car's driving performance \parencite{foucault2013market}.Liquidity impounds the usual economic concept of \textit{elasticity}. In a liquid market, a small shift in supply and demand doesn't result in large price changes \parencite{hasbrouck2007empirical}. However liquidity is also concerned with trading costs. Market makers are seen as liquidity providers (sell-side) whilst liquidity demanders are the customers (buy-side) \parencite{hasbrouck2007empirical}. A key dimension of liquidity is \textit{immediacy}. This is the ability of a investor to buy or sell an asset without having to wait to find a counterpart. With an offsetting position to sell or buy \parencite{cartea2015algorithmic}. In fact the bid-ask spread is a common measure of how liquid a market is \parencite{foucault2013market}.
+
+\subsection{Inventory-based models}
+
+\subsubsection*{Ho \& Stoll Model}
+
+\subsection{Information-based models}
+
+\subsubsection*{Glosten-Milgrom Model}
+In the Glosten-Milgrom 
+
+\subsubsection*{Das Model}
+
+%\subsection{Empirical metrics}
 
 \section{Artificial Financial Markets}
+In agent-based modelling, appropriate parts of the complex system are modeled as autonomous decision-making entities called \textit{agents} \parencite{darley2007nasdaq}
 
+
+%mention what it is, some strategies, and how it effect modern markets
+\section{Algorithmic and High-Frequency Trading}
+Algorithmic trading consists in using computer programs to implement investment and trading strategies \parencite{abergel2012market}. Conversely, High frequency trading (HFT)is a term used to describe a large diverse set of activities and behaviors \parencite{o2015high}. Where some of the main characteristics for high frequency traders are: (i) use of \textit{high-speed} and sophisticated programs for \textit{generating, executing} and \textit{routing} orders, (ii) use of \textit{co-location} to minimize \textit{latency}, (iii) very short time frames for their positions, (iv) submission of numerous orders that are cancelled shortly and (v) ending the day with almost flat positions. 
+\newline
+\newline
+A distinction can be made between algorithmic trading and HFT in their order frequency. Where HFT can enter more than thousands of orders per second, while algorithmic trading enters a few orders per minute \parencite{abergel2012market}.
+
+\subsection{Different types of strategies}
+
+\subsection{Cost and benefits}
 
 \section{Reinforcement Learning}
 
@@ -179,15 +283,15 @@ One can characterize RL problems into two main classes: \textit{prediction} and 
 \subsection{Competitive Self-Play}
 
 %mention where it has been succesfully used and show the need of the application that we want to use here for the thesis
-\subsection{Reinforcement Learning in Market Microstructure}
+\subsection{RL in Market Microstructure}
 
 
 %necessary?
-\section{Tree Search}
+%\section{Tree Search}
 
-\subsection{MinMax}
+%\subsection{MinMax}
 
-\subsection{Monte Carlo Tree Search (MCTS)}
+%\subsection{Monte Carlo Tree Search (MCTS)}
 
 %own chapter?
 \section{Related Work}
