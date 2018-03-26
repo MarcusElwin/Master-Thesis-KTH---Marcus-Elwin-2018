@@ -230,25 +230,97 @@ Another related measure is the so called \textit{relative weighted average bid-a
 \label{eq:4}
     RTWAS_{t} = \frac{\bar{a}(q) - \bar{b}(q)}{S_t}
 \end{equation}
-Where $\bar{a}(q)$ and $\bar{b}(q)$ is the average execution price for buy and sell market orders of size $q$ \parencite{foucault2013market}. On the other hand the effective spread or half-spread measures the realized difference between the price paid and the midprice. Which can also be negative indicating that one is buying at a price below or selling above the 'market price' \parencite{cartea2015algorithmic}. ES and QS differ in the fact that ES can only be measured when there is a trade while QS are always observable \parencite{cartea2015algorithmic}.
-
-Some stylized facts know about the bid-ask spread are:
+Where $\bar{a}(q)$ and $\bar{b}(q)$ is the average execution price for buy and sell market orders of size $q$ \parencite{foucault2013market}. On the other hand the effective spread or half-spread measures the realized difference between the price paid and the midprice. Which can also be negative indicating that one is buying at a price below or selling above the 'market price' \parencite{cartea2015algorithmic}. ES and QS differ in the fact that ES can only be measured when there is a trade while QS are always observable \parencite{cartea2015algorithmic}.Some stylized facts know about the bid-ask spread are \parencite{hasbrouck2007empirical, madhavan2002market}:
 \begin{itemize}
-    \item item 1
-    \item item 2
+    \item The trade prices series is a martingale
+    \item The order flow is not symmetric
+    \item The spread declines over time
+    \item The bid-ask spread are lower in high volume securities and wider for more riskier securities.
+    \item The orders are serially correlated
+    \item There is a price impact of trades
 \end{itemize}
 
 \subsubsection*{Liquidity}
 If the structure of a securities market is compared to a car design, measuring liquidity is like assessing the car's driving performance \parencite{foucault2013market}.Liquidity impounds the usual economic concept of \textit{elasticity}. In a liquid market, a small shift in supply and demand doesn't result in large price changes \parencite{hasbrouck2007empirical}. However liquidity is also concerned with trading costs. Market makers are seen as liquidity providers (sell-side) whilst liquidity demanders are the customers (buy-side) \parencite{hasbrouck2007empirical}. A key dimension of liquidity is \textit{immediacy}. This is the ability of a investor to buy or sell an asset without having to wait to find a counterpart. With an offsetting position to sell or buy \parencite{cartea2015algorithmic}. In fact the bid-ask spread is a common measure of how liquid a market is \parencite{foucault2013market}.
 
+\subsubsection*{Other measures of implicit trading costs}
+A popular benchmark in trading costs analysis is the \textit{volume-weighed average price} (VWAP). For all transaction in the stock during a interval ($T$), often a trading day \parencite{foucault2013market}:
+
+\begin{equation}
+    \label{eq:5}
+    VWAP = \sum_{t\in T}{w_t p_t}
+\end{equation}
+Where $w_t = \frac{|q_t|}{\sum_{t\in T}{|q_t|}}$ and $p_t$ and $q_t$ is the price and size of the $t^{th}$ trade. Investors evaluate their broker's performance in getting a good price for their order, by comparing their own price with the day's VWAP \parencite{foucault2013market}. Another concern for participants that wish to execute large orders, is that they will have an adverse \textit{price impact}. That is, increasing the price when buying aggressively and lowering it when selling \parencite{cartea2015algorithmic}. A normal way of measuring this, is running a regression on the change of the midprice of the form below:
+
+\begin{equation}
+    \label{eq:6}
+    \Delta S_n = \lambda q_n + \varepsilon_n
+\end{equation}
+where the parameter $\lambda$ is capturing the market's price reaction i.e. its price impact. On the other hand $q_n$ is the order imbalance or net order flow \footnote{difference between of buy and sell orders during an interval} and  $\varepsilon_n$ assumed to be normal \parencite{cartea2015algorithmic, foucault2013market}. In terms of measuring liquidity a lower $\lambda$ indicates that the market is more liquid. Due to greater competition, lower risk tolerance or lower volatility \parencite{cartea2015algorithmic}. Thus meaning that a lower $\lambda$ means that prices are less sensitive to order imbalance \parencite{foucault2013market}.    
+
 \subsection{Inventory-based models}
+A large (positive) inventory causes the dealer or market maker to face a higher cost for observing more inventory. Which lowers both bid and ask prices by the same amount \parencite{o1995market}. Vice versa holds for negative inventory. 
 
 \subsubsection*{Ho \& Stoll Model}
+In \textcite{ho1981optimal} a model that handles the risk the market maker faces when providing his service is presented. In the model the following assumptions are made:
+
+\begin{itemize}
+    \item Transactions follow a stationary continuous time stochastic jump process i.e. a Poisson process. 
+    
+    \item The arrival rate of buy orders ($\lambda_a$) and sell orders ($\lambda_b$) will depend on the dealer's ask and bid prices.
+    
+    \item The dealer face uncertainty over the future value of his portfolio $X$
+\end{itemize}
+In the the absence of any transactions the portfolio growth $dX$ is given below:
+
+\begin{equation}
+    \label{eq:8}
+    dX = r_{x}Xdt + XdZ_x
+\end{equation}
+Where $r_x$ is the mean return, $dZ_x$ is the Wiener process with mean zero variance $\sigma^{2}_X$. The dealers wealth is divided into three components: \textit{cash, inventory} and \textit{base wealth}. The value of the cash account ($F$) is:
+
+\begin{equation}
+    \label{eq:9}
+    dF = rFdt- (p-b)dq_b + (p+a)dq_a
+\end{equation}
+Which changes with buys and sells of securities earning the risk-free rate $r$. The dealers inventory ($I$) is given by:
+
+\begin{equation}
+    \label{eq:10}
+    dI = r_{I}Idt+pdq_{b} - pdq_{a} + IdZ_{I}
+\end{equation}
+The inventory consists of shares in the stock tha market maker makes.
+Finally base wealth ($Y$) is given by:
+
+\begin{equation}
+    \label{eq:11}
+    dY = r_{Y}Ydt+YdZ_{Y} 
+\end{equation}
+The objective of the dealer is now to maximize the expected utility of his otal wealth $E[U(W_T)]$ at time horizon $T$, where 
+
+\begin{equation}
+    \label{eq:12}
+    W_{T} = F_{T} + I_{T} + Y_{T}
+\end{equation}
+\autoref{eq:12} is what is termed \textit{the dealers pricing problem}. This is in fact an optimization problem where we want to maximise the value function $J(\cdot)$
 
 \subsection{Information-based models}
 
 \subsubsection*{Glosten-Milgrom Model}
-In the Glosten-Milgrom 
+In the Glosten-Milgrom one tries to capture the features of how adverse selection affects the bid ask spread \parencite{darley2007nasdaq}. One assumes the following in the model:
+\begin{itemize}
+    \item A market with trading in a single asset
+    \item All market participants are risk-neutral and act competitively
+    \item The market is \textit{frictionless} i.e. there are no transaction costs, taxes or holding costs.
+    \item The value of the asset is a random variable whose probability law is know to the market makers.
+\end{itemize}
+Informed traders have information about the realization of a assets \textit{true value}, $V$. The distribution of $V$ is assumed to be binomial. With the probability $\theta$ and $1- \theta$ if the value of the asset is higher or lower $\overline{V}, \underline{V}$  then the true value \parencite{darley2007nasdaq}. Uniformed traders only have information about the triple $(\theta, \underline{V}, \overline{V})$ and we have two fraction of these. The ones that wants to buy $\gamma^{B}$, and the ones that want to sell $\gamma^{S}$ \parencite{darley2007nasdaq}. The fraction of informed traders is instead denoted $\mu$. The market maker sets bid ($E[V|\text{Sell}]$) and ask prices ($E[V|\text{Buy}]$) by conditional expectations of the true value given a sell or buy order. By definition \parencite{darley2007nasdaq} 
+\begin{equation}
+    \label{eq:7}
+    E[V|\text{Sell}] = \underline{V}P[V=\underline{V}|\text{Sell}] + \overline{V}P[V=\overline{V}|\text{Sell}]
+\end{equation}
+And by using Bayes' rule the probabilities  can be obtained, for instance $P[V=\overline{V}|\text{Sell}] = \frac{\theta(1-\mu)\gamma^{S}}{(1-\mu)\gamma^{S} + (1-\theta)\mu}$.
+Note that the Glosten-Milgrom model has no actual auction mechanism. Which makes the model inadequate for studying the effect of microstructure on non-equilibrium market behavior \parencite{darley2007nasdaq}.
 
 \subsubsection*{Das Model}
 
@@ -270,9 +342,106 @@ A distinction can be made between algorithmic trading and HFT in their order fre
 \subsection{Cost and benefits}
 
 \section{Reinforcement Learning}
-
-\subsection{The Main Concepts}
 Reinforcement learning (RL) is learning what to do i.e. map situations to actions, in order to maximize a numerical reward function \parencite{sutton1998reinforcement}. Which is quite different from other machine learning methods based on \textit{supervised} or \textit{unsupervised} learning, where one in fact have the true labels or not.
+\subsection{The Main Concepts}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{basicRL.png}
+    \caption{Basic overview of the reinforcement learning setting with an agent interacting via actions ($A_t$) with it's environment moving through states ($S_t$). Thus gaining different rewards ($R_t$). Source: \textcite{sutton1998reinforcement} }
+    \label{fig:4}
+\end{figure}
+
+Reinforcement learning (RL) is about an agent interacting with the environment. By learning an optimal policy, by trial and error. For sequential decision making \parencite{li2017deep}. \autoref{fig:4} above illustrates a simple agent interacting with its environment. A RL agent interacts with its environment over time. At each time step $t$ the agent receives  a \textit{state} $S_t$ in a state space $\mathcal{S}$ and makes an \textit{action} $A_t$ from an action space $\mathcal{A}$ \parencite{li2017deep}. As a consequence of its action, the agent receives \textit{reward} $R_t$ which is a scalar value. The agent's goal is to maximize the total amount of cumulative reward it receives. This is know as the \textit{reward hypothesis} \parencite{sutton1998reinforcement}. The agent's behavior is modelled by the \textit{policy} $\pi(s|a)$. A policy is a mapping from a state to an action, that is the probability of selecting action $A_t=a$ if state $S_t = s$. 
+\newline
+\newline
+This also includes transitioning to the next state $S_{t+1}$ according to the environments dynamics or \textit{model} for a \textit{reward function} $\mathcal{R}(s,a)$ and \textit{state transition probability}
+\subsubsection*{Markov Decision Process}
+$\mathcal{P}(S_{t+1} |S_t, A_t)$ \parencite{li2017deep}. More formally the RL problem is formulated as an \textit{Markov Decision Process} (MPD) \parencite{sutton1998reinforcement, li2017deep}. A MDP is a tuple $(\mathcal{S, A, P, R}, \gamma)$ \parencite{li2017deep}:
+\begin{itemize}
+    \item $\mathcal{S}$ is a finite set of states
+    \item $\mathcal{A}$ is a finite set of actions
+    \item $\mathcal{P}$ is a transition probability matrix, 
+    \begin{equation} 
+        \label{eq:12a}
+        \mathcal{P}^{a}_{ss'} = P[S_{t+1} = s' | S_t =s, A_t = a]
+    \end{equation}
+    \item $\mathcal{R}$ is a reward function, 
+    \begin{equation}
+        \label{eq:12b}
+        \mathcal{R}^{a}_{s} = E[R_{t+1} | S_t =s, A_t=a]
+    \end{equation}
+    \item $\gamma \in [0,1]$ is a \textit{discount factor} 
+\end{itemize}
+In general, we seek to maximize the \textit{expected return}. Where the return, denoted $G_t$ is total discounted reward from time step $t$:
+
+\begin{equation}
+    \label{eq:13}
+    G_t = R_{t+1} + \gamma R_{t+2} + ... = \sum_{k=0}^{\infty}{\gamma^{k}R_{t+k+1}}
+\end{equation}
+The discount factor or discount rate in \autoref{eq:13} determines the present value of future rewards, $k$ steps in the future. Note that a $\gamma$ close to 0 leads to \textit{myopic} behavior i.e. the agent only cares about immediate rewards. Whilst if $\gamma$ is close to 1, the agent's is a bit more \textit{far-sighted}. When the agent-environment interaction breaks naturally into sub-sequences which is called \textit{episodes}
+\autoref{eq:13} makes sense. 
+
+\subsubsection*{Value Functions}
+
+Almost all RL algorithms involve estimating \textit{value functions} i.e. functions of states or state-action pairs. These estimate how god it is for an agent to be in a certain state \parencite{sutton1998reinforcement, li2017deep}. The value of a state $s$ under a policy $\pi$ denoted $v_{\pi}(s)$. Is the expected return when starting in $s$ and following $\pi$. Below is the \textit{state-value function for policy $\pi$}:
+
+\begin{equation}
+    \label{eq:14}
+    v_{\pi}(s) = E_{\pi}[G_t | S_t = s] = E_{\pi}\left[\sum_{k=0}^{\infty}{\gamma^{k}R_{t+k+1}} | S_t = s\right], \forall s \in \mathcal{S}.
+\end{equation}
+Note that the value of the terminal state is always zero \parencite{sutton1998reinforcement}. Similarly  we can define the the \textit{action-value function for policy $\pi$} \parencite{sutton1998reinforcement}. Which is the value of taking action $a$ in state $s$ under policy $\pi$, denoted $q_{\pi}(s,a)$. Is the expected return starting from $s$, taking the action $a$ and therefore following policy $\pi$:
+
+\begin{equation}
+    \label{eq:15}
+    q_{\pi} = E_{\pi}[G_t | S_t =s, A_t = a] = E_{\pi} \left[\sum_{k=0}^{\infty}{\gamma^{k}R_{t+k+1}} | S_t=s, A_t=a \right]
+\end{equation}
+Both \autoref{eq:14} and \autoref{eq:15} can be estimated from experiences or by using \textit{Monte Carlo Methods} \parencite{sutton1998reinforcement}.
+
+\subsubsection*{Bellman equations \& Optimality}
+Both \autoref{eq:14} and \autoref{eq:15} satisfies recursive relationships. Which is commonly know as \textit{Bellman equations} \parencite{sutton1998reinforcement}:
+
+\begin{equation}
+    \label{eq:16}
+    v_{\pi} = E[G_t | S_t = s] = E_{\pi}[R_{t+1} + \gamma G_{t+1} | S_t = s]
+\end{equation}
+
+\begin{equation}
+    \label{eq:17}
+    q_{\pi} = E_{\pi}[R_{t+1} + \gamma G_{t+1} | S_t = s,  A_t = a]
+\end{equation}
+As we can see in \autoref{eq:16} and \autoref{eq:17} the Bellman equations expresses a relationship between the value of the state and its successor states. However solving a RL task means that we want to find a policy that achieves a lot of reward over the long run. We are thus looking for \textit{optimal policies} ($\pi \geq \pi'$). We denote all optimal policies with $\pi_{*}$ whom share the same state-value and action value-value functions \parencite{sutton1998reinforcement}. We thus want to maximize the following:
+
+\begin{equation}
+    \label{eq:18}
+    v_{*}(s) = \underset{\pi}{\text{max }} v_{\pi}(s)
+\end{equation}
+
+\begin{equation}
+    \label{eq:19}
+    q_{*}(s,a) = \underset{\pi}{\text{max }} q_{\pi}(s,a)
+\end{equation}
+
+Using \autoref{eq:18} and \autoref{eq:19} together with the Bellman equation in \autoref{eq:16} and \autoref{eq:17} we get the \textit{Bellman optimality equations}:
+
+\begin{equation}
+\label{eq:20}
+\begin{aligned}
+& & v_{*}(s) =  \underset{a}{\text{max }} 
+E_{\pi_{*}}[R_{t+1} + \gamma v_{*}(S_{t+1}) | S_t =s, A_t = a] \\
+& & = \underset{a}{\text{max }} 
+\sum_{s', r}^{}{p(s', r | s,a)}[r + \gamma v_{*}(s')]
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\label{eq:21}
+\begin{aligned}
+& & q_{*}(s,a) = 
+E[R_{t+1} + \gamma \underset{a'}{\text{max }}q_{*}(S_{t+1, a'}) | S_t =s, A_t = a] \\
+& & =  \sum_{s', r}^{}{p(s', r | s,a)}[r + \gamma \underset{a'}{\text{max }}q_{*}(s',a')]
+\end{aligned}
+\end{equation}
+For a finite MDP \autoref{eq:20} and \autoref{eq:21} has a unique solution independent of the policy \parencite{sutton1998reinforcement}. Nevertheless, in practice there is no closed form solution for these equations. Therefore one must resort to approximate and iterative methods. That uses \textit{dynamic programming} or Monte Carlo methods.
 
 \subsection{Exploration versus Exploitation}
 In reinforcement learning we have a trade-off between \textit{exploration} and \textit{exploitation}. Where exploration refers to taking actions, that come from the current best version of the learned policy. Exploration instead is concerned with taking more actions to obtain more training data \parencite{goodfellow2016deep}. Where the dilemma is that neither exploration nor exploitation can be pursued exclusively without failing at the task \parencite{sutton1998reinforcement}.
@@ -284,6 +453,8 @@ One can characterize RL problems into two main classes: \textit{prediction} and 
 
 %mention where it has been succesfully used and show the need of the application that we want to use here for the thesis
 \subsection{RL in Market Microstructure}
+
+\subsection{Issues with deep RL}
 
 
 %necessary?
