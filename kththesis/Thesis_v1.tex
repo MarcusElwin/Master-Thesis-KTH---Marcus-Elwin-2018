@@ -22,7 +22,6 @@
 \usepackage{graphicx}
 \usepackage[]{algorithm2e} %for algos
 
-
 %for clickable hyperlinks
 %colors for different links
 \usepackage{hyperref}
@@ -452,7 +451,26 @@ E[R_{t+1} + \gamma \underset{a'}{\text{max }}q_{*}(S_{t+1, a'}) | S_t =s, A_t = 
 For a finite MDP \autoref{eq:20} and \autoref{eq:21} has a unique solution independent of the policy \parencite{sutton1998reinforcement}. Nevertheless, in practice there is no closed form solution for these equations. Therefore one must resort to approximate and iterative methods. That uses \textit{dynamic programming} or Monte Carlo methods.
 
 \subsection{Exploration versus Exploitation}
-In reinforcement learning we have a trade-off between \textit{exploration} and \textit{exploitation}. Where exploration refers to taking actions, that come from the current best version of the learned policy. Exploration instead is concerned with taking more actions to obtain more training data \parencite{goodfellow2016deep}. Where the dilemma is that neither exploration nor exploitation can be pursued exclusively without failing at the task \parencite{sutton1998reinforcement}.
+In reinforcement learning we have a trade-off between \textit{exploration} and \textit{exploitation}. Where exploration refers to taking actions, that come from the current best version of the learned policy. Exploration instead is concerned with taking more actions to obtain more training data \parencite{goodfellow2016deep}. Where the dilemma is that neither exploration nor exploitation can be pursued exclusively without failing at the task \parencite{sutton1998reinforcement}. There exist some strategies to balance the trade-off between exploration and exploitation. By employing a \textit{greedy} approach i.e. choose the action with the highest payoff \parencite{sutton1998reinforcement, szepesvari2009algorithms}.
+
+\begin{equation}
+    \label{eq:21a}
+    A_t = \underset{a}{\operatorname{argmax}}Q_t(a)
+\end{equation}
+A simple modification of \autoref{eq:21a} is to fix $\varepsilon > 0$ and choose a random selected action. With probability $\varepsilon$ and go with the greedy choice else. This strategy is the $\varepsilon$-greedy one. Another approach is \textit{Boltzman exploration} \parencite{sutton1998reinforcement,szepesvari2009algorithms} which given the sample means of the actions at time $t$. The next action is drawn from the multinominal distribution of $\pi_t$, where 
+
+\begin{equation}
+    \label{eq:21b}
+    P_t(a) = \frac{\exp{(q_{t}(a)/\tau)}}{ \sum_{i=1}^{n}{\exp{(q_{t}(i)/ \tau)}}} = \pi_t(a)
+\end{equation}
+Where $ \tau$ is a temperature parameter annealed over time.
+Finally there also exist approaches based on the \textit{optimism in the face of uncertainty}. According to which where the learner should choose the action with the best upper confidence bound (UCB) \parencite{sutton1998reinforcement, szepesvari2009algorithms}
+
+\begin{equation}
+    \label{eq:21c}
+    A_t = \underset{a}{\operatorname{argmax}} \left[Q_t(a) + c \sqrt{\frac{\ln{t}}{N_t(a)}} \right]
+\end{equation}
+Where $t$ is the time, $c$ controls the degree of exploration and $N_t(a)$ is the number of times that action $a$ has been selected \parencite{sutton1998reinforcement}.
 
 \subsection{Algorithms \& Learning in RL}
 One can characterize RL problems into two main classes: \textit{prediction} and \textit{control} where each is followed by different approaches as \textit{value iteration, policy iteration} and \textit{policy search} \parencite{szepesvari2009algorithms}. 
@@ -461,8 +479,185 @@ These different approaches uses different algorithms. Note that all these algori
 
 %neeed this? maybe put in appendix..
 \subsubsection*{Dynamic Programming \& Monte Carlo Methods}
-In order to find optimal solutions for \autoref{eq:20} and \autoref{eq:21} we must resort to using approximate methods as dynamic programming. The key idea of dynamic programming is to use the value functions to organize and structure the search for good policies \parencite{sutton1998reinforcement, szepesvari2009algorithms}. We start with \textit{policy iteration} which can be used to find an optimal policy shown in \autoref{alg1}:
+In order to find optimal solutions for \autoref{eq:20} and \autoref{eq:21} we must resort to using approximate methods as dynamic programming. The key idea of dynamic programming is to use the value functions to organize and structure the search for good policies \parencite{sutton1998reinforcement, szepesvari2009algorithms}. Once a policy $\pi$ has been improved using $v_{\pi}$ to yield a better policy,  $\pi'$. We can then compute $v_{\pi}'$ and improve it again to yield policy $\pi^{''}$ \parencite{sutton1998reinforcement}. This is what \textit{policy iteration} is about and is described more in \autoref{alg1} found in \autoref{app:A}.
+\newline
+\newline
+One drawback with \autoref{alg1} is that is quite computationally expensive as it involves policy evaluation over the state space \parencite{sutton1998reinforcement}. A remedy for this is \textit{value iteration}. Where the basic idea is to use early stopping i.e. one update of each state. Which is shown in \autoref{alg2} in \autoref{app:A}. Conversely \textit{Monte Carlo methods} (MCM) require only experience i.e. sample sequences of states, actions, and rewards. From actual or simulated interaction with the environment \parencite{sutton1998reinforcement}. MCM solves reinforcement learning problems based on averring sample returns. 
 
+
+\subsubsection*{Q-Learning \& SARSA}
+\textit{Temporal difference} (TD) learning can be seen as a combination of Monte Carlo methods and dynamic programming. That learn directly from raw experience without a model of the environment's experience \parencite{sutton1998reinforcement, arulkumaran2017brief}. The most simple TD method makes the following update:
+
+\begin{equation}
+    \label{eq:22}
+    V(S_t) \leftarrow V(S_t) + \alpha \left[R_{t+1} + \gamma V(S_{t+1} - V(S_t) \right]
+\end{equation}
+This idea is applicable both to \textit{Q-Learning} and \textit{State-action-reward-state-action} (SARSA) which are both cases of TD learning. However Q-Learning is a \textit{off-policy} method whilst SARSA is an \textit{on-policy method} \parencite{sutton1998reinforcement, arulkumaran2017brief}. Now we are interested in learning an \textit{action-value} function which we estimate with $Q^{}$, instead of a state-value function. The update rule for SARSA is given below in \autoref{eq:23}:
+
+\begin{equation}
+    \label{eq:23}
+    Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
+\end{equation}
+Q-learning instead estimates  $q_{*}$ \footnote{The optimal action-value function} with the learned action-value function $Q$ independent of the policy being followed \parencite{sutton1998reinforcement}. 
+%\newpage
+The main update rule for \textit{Q-learning} is given below in 
+
+\begin{equation}
+    \label{eq:24}
+     Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[R_{t+1} + \gamma \underset{a}{\operatorname{max}} Q(S_{t+1}, a) - Q(S_t, A_t) \right]
+\end{equation}
+
+\subsubsection*{Deep Q Networks (DQN}
+In \textcite{mnih2015human} from Google DeepMind created Deep Q Learning (DQN). Which replaces the $Q$ function with a neural network called \textit{Q-network}. This method also keeps track of some observations in memory which is called \textit{experience replay} \parencite{mnih2015human}. The agents experience is stored $e_t = (s_t, a_t, r_t, s_{t+1})$ at each time step in a data set $D_t = \{e_1, ..., e_t\}$. Where on Q-learning updates the experience is drawn uniformly \parencite{mnih2015human}. They use a deep convolutional network to the approximate optimal action-value function $Q^{*}$. The Q-learning update at iteration $i$ uses the loss function in \autoref{eq:25} below:
+
+\begin{equation}
+    \label{eq:25}
+    L_i(\theta_i) = \mathbb{E}_{(s,a,r,s') \sim U(D)} \left[\left(r+ \gamma \underset{a'}{\operatorname{max}}Q(s', a', \theta_{i}^{-})-Q(s,a;\theta_i)  \right)^2 \right]
+\end{equation}
+Where $\gamma$ is the discount factor, $\theta_i$ are the parameters of the Q-network. $\theta_{i}^{-}$ is the parameters of the target network \parencite{mnih2015human}.
+
+%add full algorithm here
+
+\subsubsection*{Policy Gradients \& Proximal Policy Optimization (PPO)}
+Policy gradients methods work by  directly computing an estimate of the gradient of policy parameters in order to maximize the expected return. This by using stochastic gradient descent \parencite{bansal2017emergent}. 
+Policy gradient methods work by computing an estimator of the policy gradient and plugin it in to a stochastic gradient ascent algorithm \parencite{schulman2017proximal}. The most common estimator is shown below in \autoref{eq:26}
+
+\begin{equation}
+    \label{eq:26}
+    \hat{g} = \hat{\mathbb{E}}_{t}\left[\nabla_{\theta} \log{\pi_{\theta}(a_t|s_t)\hat{A}_{t}} \right]
+\end{equation}
+Where $\pi_{\theta}$ is a stochastic policy and $\hat{A}_{t}$ is an estimator of the advantages function at timestep $t$. The advantage function is shown below in \autoref{eq:27}:
+
+\begin{equation}
+    \label{eq:27}
+    \hat{A}_{t} = -V(s_t) + r_t +\gamma r_{t+1} + ... \gamma^{T-t+1} r_{T-1} + \gamma^{T-t}V(s_T).
+\end{equation}
+In \textcite{schulman2017proximal} they propose a new family of policy gradient methods. That alternates between sampling data through interaction with the environment, and optimizing a "surrogate" objective function using stochastic gradient ascent.  The surrogate function that we want to optimize is given by \autoref{eq:28} below: 
+
+\begin{equation}
+    \label{eq:28}
+    L_{t}^{CLIP + VF+ S}(\theta) = \hat{\mathbb{E}_{t}} = \left[L_{t}^{CLIP}(\theta) + c_1 L_{t}^{VF}(\theta) + c_2S[\pi_{\theta}(s_t)]\right]
+\end{equation}
+Where $c_1,c_2$ are coefficients, and S is an entropy bonus. $L_{t}^{CLIP}$ is the clipped surrogate objective and $L_{t}^{VF}$ is a squarred-error loss \parencite{schulman2017proximal}.
+%add full algorithm here
+
+\subsection{Competitive Self-Play}
+Many real-world applications can be described as large-scale of games of imperfect information. A game is a domain of conflict for cooperation between several entities \parencite{heinrich2016deep}. Where the optimal solutions for these types of situations would be Nash equilibrium. That is an strategy from which no agent would choose to deviate \parencite{heinrich2016deep}. This is where self-play comes in, which is based on the idea of \textit{fictitious play}. This is where fictitious players choose best responses to their opponents' average behaviour \parencite{heinrich2016deep}. In \textit{Fictious Self-Play} (FSP) on the other hand the agents generate datasets of their experience in self-play \parencite{heinrich2016deep}.  Each agent stores transition tuples $(s_t, a_t, r_{t+1}, s_{t+1})$ in a memory $\mathcal{M}_{RL}$ for reinforcement learning (confer experience replay). Experience of the agent's own behaviour $(s_t, a_t)$ is stored in a separate memory for supervised learning $\mathcal{M}_{SL}$ \parencite{heinrich2016deep}.
+\newline
+\newline
+\textcite{bansal2017emergent} mentioned that in a competitive-multi agent environment trained with self-play. Far more complex behaviours then the environment itself can emerge. In general training an agent to perform a highly complicated task requires a complicated environment, but there exists environments where behaviour of the agent is far more complex. Then the environment itself \parencite{bansal2017emergent}. These types of environments have two interesting properties:
+
+\begin{enumerate}
+    \item Very simple competitive multi-agent environments can produce extremely complex behavior
+    \item When training with self-play the environment provides the agents with  a perfect curriculum.
+\end{enumerate}
+
+%mention where it has been succesfully used and show the need of the application that we want to use here for the thesis
+%\subsection{RL in Market Microstructure}
+
+\subsection{Issues with deep RL}
+
+
+%necessary?
+%\section{Tree Search}
+
+%\subsection{MinMax}
+
+%\subsection{Monte Carlo Tree Search (MCTS)}
+
+%own chapter?
+\chapter{Related Work}
+In this chapter previous related work is presented. To give a view over what has been done previously as well as current state of the art. Also the difference between this work and previous work is discussed. The chapter is divided into the following sections: \textit{Agent Financial Markets, Market Microstructure} and \textit{Reinforcement Learning in Finance}.
+
+\section{Agent based Financial Markets}
+The field of finance and economics have used various approaches to model financial markets dynamics. Among these three main groups of approaches can be distinguished: \textit{statistical models}, \textit{Dynamic Stochastic General Equilibrium (DSGE)} and \textit{Agent-Based Models (ABM)} \parencite{lussange2018bright}. Agent-based financial markets of different characteristics have been developed for some time. A early model is given in \parencite{raberto2001agent} where they in their 'Geona market' have agents adopting strategies as chartist, fundamentalist or random. A drawback with the model is that it doesn't manage to correctly represent the price behavior in the market \parencite{raberto2001agent}. In this thesis we aim to do so, by using reinforcement learning instead. 
+\newline
+\newline
+Good overviews of agent based modelling in a financial setting, is given in \parencite{martinez2009evolutionary, boer2008agent, lebaron2006agent}. Where a more recent overview of agent based modelling in finance and economics is presented in \parencite{lussange2018bright}. In \textcite{martinez2009evolutionary} they introduce CHASM which is a software platform that allows user to experiment with different market scenarios. This market is composed of technical, fundamental and noise traders. 
+\newpage
+Where genetic programming seems to be the core learning process employed and decision trees. A difference between the study by \textcite{martinez2009evolutionary} and this thesis, is that the environment used will be more complex. With a matching engine and different algorithmic trading strategies as market making and HFT trading. To successfully study market microstructure phenomena. We will also use reinforcement learning for learning used by the agents in the complex environment. Generally speaking there are two major approaches to agent-based financial market simulations, where the first one focuses on specific market structure. Whilst the second approach is more focused on generating a flexible environment with flexible settings for the agents employed \parencite{brandouy2011design}. This thesis will focus more on the second approach in order to see what type of behaviour the agents exhibit exposed to different market conditions. 
+\newline
+\newline
+In \textcite{brandouy2011design} they design a artificial stock market called ATOM based on the Euronext-NYSE Stock exchange, with the possibility to add ''human agents''. They have for instance a limit order-book as the thesis aim to use, but it is unclear whether they employ a functional matching engine. Which this study will use, by using the parity engine \footnote{\url{http://paritytrading.com/}}. They also use different types of agents for instance \textit{zero intelligence traders, technical traders, evolutionary agents, risk averse agents} and \textit{mean-variance agents}. 
+\newline
+\newline
+Nevertheless, none of these are based on reinforcement learning or competitive self-play as will be used in this thesis. One of the main benefits with using agent based modelling is that they demonstrate the ability to produce realistic system dynamics, which are comparable to those observed empirically \parencite{platt2016problem}. In their study the calibrate their agents by using heuristic optimization , Nelder-Mead simplex algorithm and a genetic algorithm. They use a simpler form of matching engine, not as elaborated as the parity engine. They also only use a low-frequency trader and high-frequency trader. Where this thesis may use one or several different types of traders
+
+\section{Market Microstructure}
+Market microstructure studies the process by which investors' latent demands are ultimately translated into prices and volumes \parencite{madhavan2000market}. It is of importance for this thesis to understand market microstructure both theoretically and empirical. In order to replicate and even find new interesting behaviour of the agents, employed in this kind of environment. In \textcite{haferkorn2017high, agarwal2012high} the effect of HFT trading and fragmentation is discussed. Which is of interest for market micro-structure. This as fragmentation leads to more competition on the markets. That might be demonstrated by the agents. Some common references that have been and are still used in the state of the art market microstructure research is \parencite{o1995market,hasbrouck2007empirical, madhavan2000market, madhavan2002market}. There both \textit{inventory-based} and \textit{information based} models are discussed. In this thesis both an inventory-based and information based model will be used as a benchmark, for the learning agents. 
+\newline
+\newline
+A common inventory-based model, that uses dynamic programming to find the optimal dealer price in a one-dealer market. Is given in \textcite{ho1981optimal}. A problem with the model in \parencite{ho1981optimal} is that here is no closed form solution, thus approximations is used to get arbitrarily close to the solution. By using reinforcement learning we hope to be able to replicate the behaviour of the agents shown in the previous paper. However, also extending it, and see how the agents perform and behave in a more complex market. With several dealers for instance. The information based models on the other hand tries to incorporate the element that some traders are more informed than others. Which is called \textit{asymmetric information} or \textit{adverse selection} in the market microstructure literature \parencite{o1995market, hasbrouck2007empirical}. 
+\newline
+\newline
+A recent model for this is the one presented in \parencite{das2003intelligent, das2005learning}. Which is an extension of the model presented in \textcite{glosten1985bid}. The Glosten and Milgrom model derives the market makers price by setting equations under asymmetric information. To be such that the bid/ask quotes are the expectations conditioned on if the order is a buy or sell order. In \textcite{das2005learning} on the other hand they employ a non-parametric density estimate of the true value or fundamental value of the stock. This by using Bayesian Learning. 
+
+\newpage
+We will be training our agents on an environment similar to the one described in \parencite{das2005learning} but with reinforcement learning instead. We hope to see the same market dynamics as they did in their study. To further validate the agents learning of trading dynamics. Before using them on the more complex model with the matching engine. Finally in \textcite{o2015high} they mentioned that in a high-frequency world. Older empirical models may no longer be appropriate. Where this thesis aims to provide a step in a new direction for this type of research.
+
+\section{Reinforcement Learning in Finance}
+
+Reinforcement learning or \textit{neuro-dynamic programming} as it also have been called in the literature. Have been used previously in a financial setting. Where some of the earlier applications have been in trading. In \textcite{moody1999reinforcement} the author's explore the opportunity of using reinforcement learning for trading. Using Recurrent Reinforcement Learning (RRL) and Q-learning and looking at the S\& P 500 index. Not that much focus is on trading dynamics. Which will be the main focus of  this thesis, on a completely different market. In \parencite{dempster2006automated, du2016algorithm, wang2016reinforcement, casqueiro2006neuro, bertoluzzo2012testing} they discuss the usages of different types of reinforcement learning algorithms for trading. Where trading is done in for example foreign exchange or the energy market. None of these use a matching engine, or a more complex environment with several HFT/market maker agents. Or with the possibility of completely changing the market conditions. Which this thesis aims to do. 
+\newline
+\newline
+In \textcite{kearns2013machine} they give a good overview of reinforcement learning used in market microstructure and high-frequency trading. With use-cases in optimized trade execution, prediction of price movements and optimized execution in dark pools. Nevertheless none of these studies are using competitive self-play in their learning. In \parencite{nevmyvaka2006reinforcement, hendricks2014reinforcement}  optimized trade execution is studied with the help of reinforcement learning. Which is of importance in market microstructure and might be examined in this thesis. However for this thesis one of the main objectives is to understand and successfully replicate know behaviour of traders in a dynamic market. Where some studies concerned with understanding the behaviour of traders are presented in \parencite{yang2014algorithmic, yang2012behavior}. 
+\newline
+\newline
+Where they use \textit{inverse reinforcement learning} on trading decisions. The idea is to find the reward function given the observations of optimal trading behaviour and then use it for trader identification. 
+Although interesting this thesis is not interested in capturing key characteristic of already optimal HFT strategies. Instead we want to see what optimal or not optimal behaviour the agents will use, and how they will react to changed market conditions. Therefore reinforcement learning is used instead. Another common application of reinforcement learning is also in market making see for instance \parencite{jumadinova2010comparison,chan2001electronic, fernandez2015high, sherstov2004three}. Market making strategies will be implemented in this thesis along with other algorithmic trading strategies. To make the market more plausible. 
+\newline
+\newline
+In \textcite{cartea2015algorithmic} some common algorithmic trading strategies are presented, focusing on stochastic optimal control.
+A previous study has been done at NASDAQ investigating the effects of tick size changes \textcite{darley2007nasdaq}. Where the strategies employed where a simpler form of reinforcement learning, together with dynamic programming approaches. This study is of-course used as an inspiration, but the thesis will be different in that it incorporates a more realistic market. With the matching engine, and several different types of agents. When modelling stock agents some previous studies conducted are \parencite{pastore2015modelling, rutkauskas2009building}. This study aims to do the something similar, but on the Nordic stock market. As this study want's to understand the trading dynamics for example market makers and algorithmic traders. 
+\newline
+\newline
+Nevertheless, in order to train the agents in the trading environments, we need to understand reinforcement learning. In \parencite{arulkumaran2017brief, mnih2015human, li2017deep} good overviews of the current state of the art deep reinforcement learning (RL) is presented.  Recently some of the state of the art research, has been driven by DeepMind and their work with the game Go. See for instances \parencite{silver2016mastering, silver2017mastering, vinyals2017starcraft}, that serves as inspiration of best practices. Competitive self-play is introduced and examined in \parencite{bansal2017emergent, schulman2017proximal}. Which is the main idea to be examined in this thesis. However applied to the Nordic financial market instead of games. In \parencite{busoniu2008comprehensive, bucsoniu2010multi} some of the most common multiagent reinforcement learning strategies are discussed. Where this thesis will use a multiagent approach too, when training several agents. That will interact and competent with each other. 
+
+\chapter{Methods}
+
+\section{Overview}
+
+\section{Data}
+
+\section{Software \& Hardware}
+
+\section{Evaluation}
+
+\section{Validation}
+
+\chapter{Results}
+
+\chapter{Discussion \& Conclusions}
+
+\printbibliography[heading=bibintoc] % Print the bibliography (and make it appear in the table of contents)
+
+\appendix 
+
+
+\chapter{Policy and Value Iteration}\label{app:A}
+In this chapter algorithms using dynamic programming for finding optimal value and optimal policy is shown. Based on the material in \parencite{sutton1998reinforcement}.
+
+\section{Value Iteration}
+\RestyleAlgo{boxruled}
+\LinesNumbered
+\begin{algorithm}[H]
+ %\KwIn{A MDP i.e.  $(\mathcal{S, A, P, R}, \gamma)$}
+ %\KwResult{Returns optimal policy ($\pi_{*}$)}
+ \textsf{Initialize $V$ arbitrarily e.g. $V(s) = 0$} \;
+ $\Delta \leftarrow 0$ \;
+ \While{$\Delta < \theta$ (small positive number)}{
+ \ForEach{$s \in \mathcal{S}$}{
+ $v \leftarrow V(s)$ \;
+ $V(s) \leftarrow \underset{a}{\operatorname{max}} \sum_{s', r}{p(s', r |s, \pi(s))[r + \gamma V(s')]}$ \;
+ $\Delta \leftarrow \max(\Delta, |v - V(s)|)$ 
+    }
+ }
+ \KwOut{deterministic policy , $\pi \approx \pi_{*}$ s.t. $\pi (s) = \underset{a}{\operatorname{argmax}} \sum_{s', r}{p(s', r|s,a)[r+\gamma V(s')]}$} 
+ \caption{Value iteration}
+ \label{alg2}
+\end{algorithm}
+
+\section{Policy Iteration}
 \RestyleAlgo{boxruled}
 \LinesNumbered
 \begin{algorithm}[H]
@@ -498,103 +693,5 @@ In order to find optimal solutions for \autoref{eq:20} and \autoref{eq:21} we mu
  \caption{Policy iteration}
  \label{alg1}
 \end{algorithm}
-
-\newpage
-One drawback with \autoref{alg1} is that is quite computationally expensive as it involves policy evaluation over the state space \parencite{sutton1998reinforcement}. A remedy for this is \textit{value iteration} shown below:
-
-\RestyleAlgo{boxruled}
-\LinesNumbered
-\begin{algorithm}[H]
- %\KwIn{A MDP i.e.  $(\mathcal{S, A, P, R}, \gamma)$}
- %\KwResult{Returns optimal policy ($\pi_{*}$)}
- \textsf{Initialize $V$ arbitrarily e.g. $V(s) = 0$} \;
- $\Delta \leftarrow 0$ \;
- \While{$\Delta < \theta$ (small positive number)}{
- \ForEach{$s \in \mathcal{S}$}{
- $v \leftarrow V(s)$ \;
- $V(s) \leftarrow \underset{a}{\operatorname{max}} \sum_{s', r}{p(s', r |s, \pi(s))[r + \gamma V(s')]}$ \;
- $\Delta \leftarrow \max(\Delta, |v - V(s)|)$ 
-    }
- }
- \KwOut{deterministic policy , $\pi \approx \pi_{*}$ s.t. $\pi (s) = \underset{a}{\operatorname{argmax}} \sum_{s', r}{p(s', r|s,a)[r+\gamma V(s')]}$} 
- \caption{Value iteration}
- \label{alg2}
-\end{algorithm}
-
-\subsubsection*{Q-Learning \& SARSA}
-\textit{Temporal difference} (TD) learning can be seen as a combination of Monte Carlo methods and dynamic programming. That learn directly from raw experience without a model of the environment's experience \parencite{sutton1998reinforcement, arulkumaran2017brief}. The most simple TD method makes the following update:
-
-\begin{equation}
-    \label{eq:22}
-    V(S_t) \leftarrow V(S_t) + \alpha \left[R_{t+1} + \gamma V(S_{t+1} - V(S_t) \right]
-\end{equation}
-This idea is applicable both to \textit{Q-Learning} and \textit{State-action-reward-state-action} (SARSA) which are both cases of TD learning. However Q-Learning is a \textit{off-policy} method whilst SARSA is an \textit{on-policy method} \parencite{sutton1998reinforcement, arulkumaran2017brief}. Now we are interested in learning an \textit{action-value} function which we estimate with $Q^{}$, instead of a state-value function. The update rule for SARSA is given below in \autoref{eq:23}:
-
-\begin{equation}
-    \label{eq:23}
-    Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
-\end{equation}
-Q-learning instead estimates  $q_{*}$ \footnote{The optimal action-value function} with the learned action-value function $Q$ independent of the policy being followed \parencite{sutton1998reinforcement}. 
-\newpage
-The main update rule for \textit{Q-learning} is given below in 
-
-\begin{equation}
-    \label{eq:24}
-     Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[R_{t+1} + \gamma \underset{a}{\operatorname{max}} Q(S_{t+1}, a) - Q(S_t, A_t) \right]
-\end{equation}
-
-\subsubsection*{Deep Q Networks (DQN}
-In \textcite{mnih2015human} from Google DeepMind created Deep Q Learning (DQN). Which replaces the $Q$ function with a neural network called \textit{Q-network}. This method also keeps track of some observations in memory which is called \textit{experience replay} \parencite{mnih2015human}. The agents experience is stored $e_t = (s_t, a_t, r_t, s_{t+1})$ at each time step in a data set $D_t = \{e_1, ..., e_t\}$. Where on Q-learning updates the experience is drawn uniformly \parencite{mnih2015human}. They use a deep convolutional network to the approximate optimal action-value function $Q^{*}$. The Q-learning update at iteration $i$ uses the loss function in \autoref{eq:25} below:
-
-\begin{equation}
-    \label{eq:25}
-    L_i(\theta_i) = \mathbb{E}_{(s,a,r,s') \sim U(D)} \left[\left(r+ \gamma \underset{a'}{\operatorname{max}}Q(s', a', \theta_{i}^{-})-Q(s,a;\theta_i)  \right)^2 \right]
-\end{equation}
-Where $\gamma$ is the discount factor, $\theta_i$ are the parameters of the Q-network. $\theta_{i}^{-}$ is the parameters of the target network \parencite{mnih2015human}.
-
-%add full algorithm here
-
-\subsubsection*{Proximal Policy Optimization (PPO)}
-
-%add full algrotihm here
-
-\subsection{Competitive Self-Play}
-In \textcite{bansal2017emergent} mentioned that in a competitive-multi agent environment trained with self-play. Far more complex behaviours then the environment itself can emerge. In general training an agent to perform a highly complicated task requires a complicated environment, but there exists environments where behaviour of the agent is far more complex. Then the environment itself \parencite{bansal2017emergent}. These types of environments have two interesting properties:
-
-\begin{enumerate}
-    \item Very simple competitive multi-agent environments can produce extremely complex behavior
-    \item When training with self-play the environment provides the agents with  a perfect curriculum.
-\end{enumerate}
-
-%mention where it has been succesfully used and show the need of the application that we want to use here for the thesis
-\subsection{RL in Market Microstructure}
-
-\subsection{Issues with deep RL}
-
-
-%necessary?
-%\section{Tree Search}
-
-%\subsection{MinMax}
-
-%\subsection{Monte Carlo Tree Search (MCTS)}
-
-%own chapter?
-\section{Related Work}
-
-
-\chapter{Methods}
-
-\chapter{Experiments}
-
-\chapter{Results}
-
-\chapter{Discussion \& Conclusions}
-
-\printbibliography[heading=bibintoc] % Print the bibliography (and make it appear in the table of contents)
-
-\appendix
-
-\chapter{Unnecessary Appended Material}
 
 \end{document}
