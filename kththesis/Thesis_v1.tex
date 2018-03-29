@@ -10,6 +10,7 @@
 \usepackage{xcolor}
 \usepackage{color}
 \usepackage{amsmath,float}
+\usepackage{amssymb}
 \usepackage{caption}
 \captionsetup[figure]{labelfont=bf}
 \usepackage{amsthm}
@@ -19,6 +20,7 @@
 \newtheorem{RQ}{Research Question}[section]
 
 \usepackage{graphicx}
+\usepackage[]{algorithm2e} %for algos
 
 
 %for clickable hyperlinks
@@ -379,7 +381,13 @@ In general, we seek to maximize the \textit{expected return}. Where the return, 
     G_t = R_{t+1} + \gamma R_{t+2} + ... = \sum_{k=0}^{\infty}{\gamma^{k}R_{t+k+1}}
 \end{equation}
 The discount factor or discount rate in \autoref{eq:13} determines the present value of future rewards, $k$ steps in the future. Note that a $\gamma$ close to 0 leads to \textit{myopic} behavior i.e. the agent only cares about immediate rewards. Whilst if $\gamma$ is close to 1, the agent's is a bit more \textit{far-sighted}. When the agent-environment interaction breaks naturally into sub-sequences which is called \textit{episodes}
-\autoref{eq:13} makes sense. 
+\autoref{eq:13} makes sense.  Another key concept underlying RL is the \textit{Markov property} i.e. only the current state affects the next state \parencite{arulkumaran2017brief}. More formally this means:
+
+\begin{equation}
+    \label{eq:13b}
+    P[S_{t+1} | S_t] = P[S_{t+1} | S_1, ..., S_t]
+\end{equation}
+\autoref{eq:13b} states that the future is conditionally independent of the past given the present state. According to \textcite{arulkumaran2017brief} this assumption is somewhat unrealistic. As it requires the states to be fully observable. A generalization of a MDPs are partially observable MDPS (POMDPS). In which the agent receives an observation $O_t \in \mathcal{O}$. Where the distribution of the observation is $P(O_{t+1} | S_{t+1} | A_t)$\parencite{arulkumaran2017brief}. Which is dependent on the current state and the previous action.
 
 \subsubsection*{Value Functions}
 
@@ -447,9 +455,116 @@ For a finite MDP \autoref{eq:20} and \autoref{eq:21} has a unique solution indep
 In reinforcement learning we have a trade-off between \textit{exploration} and \textit{exploitation}. Where exploration refers to taking actions, that come from the current best version of the learned policy. Exploration instead is concerned with taking more actions to obtain more training data \parencite{goodfellow2016deep}. Where the dilemma is that neither exploration nor exploitation can be pursued exclusively without failing at the task \parencite{sutton1998reinforcement}.
 
 \subsection{Algorithms \& Learning in RL}
-One can characterize RL problems into two main classes: \textit{prediction} and \textit{control} where each is followed by different approaches as \textit{value iteration, policy iteration} and \textit{policy search} \parencite{szepesvari2009algorithms}. These different approaches uses different algorithms 
+One can characterize RL problems into two main classes: \textit{prediction} and \textit{control} where each is followed by different approaches as \textit{value iteration, policy iteration} and \textit{policy search} \parencite{szepesvari2009algorithms}. 
+\newline
+These different approaches uses different algorithms. Note that all these algorithms are implemented in both \parencite{plappert2016kerasrl, baselines} libraries used in the thesis. In general deep reinforcement learning is based on the algorithms below, but with deep neural networks. To approximate $V^{*}, Q^{*}$ and $A^{*}$ \parencite{arulkumaran2017brief}. 
+
+%neeed this? maybe put in appendix..
+\subsubsection*{Dynamic Programming \& Monte Carlo Methods}
+In order to find optimal solutions for \autoref{eq:20} and \autoref{eq:21} we must resort to using approximate methods as dynamic programming. The key idea of dynamic programming is to use the value functions to organize and structure the search for good policies \parencite{sutton1998reinforcement, szepesvari2009algorithms}. We start with \textit{policy iteration} which can be used to find an optimal policy shown in \autoref{alg1}:
+
+\RestyleAlgo{boxruled}
+\LinesNumbered
+\begin{algorithm}[H]
+ %\KwIn{A MDP i.e.  $(\mathcal{S, A, P, R}, \gamma)$}
+ %\KwResult{Returns optimal policy ($\pi_{*}$)}
+ \textsf{1. Initialize} \;
+ $V(s) \in \mathbb{R}$ and  $\pi(s) \forall s\in \mathcal{S} $ \;
+ $\Delta \leftarrow 0$ \;
+ \textsf{2. Policy Evaluation}\;
+ \While{$\Delta < \theta$ (small positive number)}{
+ \ForEach{$s \in \mathcal{S}$}{
+ $v \leftarrow V(s)$ \;
+ $V(s) \leftarrow \sum_{s', r}{p(s', r |s, \pi(s))[r + \gamma V(s')]}$ \;
+ $\Delta \leftarrow \max(\Delta, |v - V(s)|)$ 
+    }
+ }
+ 
+ \textsf{3. Policy Improvement}\;
+ 
+ $policy\_stable \leftarrow true$ \;
+ \While{$not$ $policy\_stable$)}{
+ \ForEach{$s \in \mathcal{S}$}{
+ $old\_action \leftarrow \pi(s)$ \;
+ $\pi(s) \leftarrow \underset{a}{\operatorname{argmax}} \sum_{s', r}{p(s', r|s,a)[r+\gamma V(s')]}$ \;
+ 
+ \lIf{$old\_action \neq \pi(s)$} {$policy\_stable \leftarrow false$} 
+ 
+  }
+  \lIf{$policy\_stable$} {stop} \lElse{go to 2} 
+ }
+ 
+ \Return $V \approx v_{*}$ and $\pi \approx \pi_{*}$ \;
+ \caption{Policy iteration}
+ \label{alg1}
+\end{algorithm}
+
+\newpage
+One drawback with \autoref{alg1} is that is quite computationally expensive as it involves policy evaluation over the state space \parencite{sutton1998reinforcement}. A remedy for this is \textit{value iteration} shown below:
+
+\RestyleAlgo{boxruled}
+\LinesNumbered
+\begin{algorithm}[H]
+ %\KwIn{A MDP i.e.  $(\mathcal{S, A, P, R}, \gamma)$}
+ %\KwResult{Returns optimal policy ($\pi_{*}$)}
+ \textsf{Initialize $V$ arbitrarily e.g. $V(s) = 0$} \;
+ $\Delta \leftarrow 0$ \;
+ \While{$\Delta < \theta$ (small positive number)}{
+ \ForEach{$s \in \mathcal{S}$}{
+ $v \leftarrow V(s)$ \;
+ $V(s) \leftarrow \underset{a}{\operatorname{max}} \sum_{s', r}{p(s', r |s, \pi(s))[r + \gamma V(s')]}$ \;
+ $\Delta \leftarrow \max(\Delta, |v - V(s)|)$ 
+    }
+ }
+ \KwOut{deterministic policy , $\pi \approx \pi_{*}$ s.t. $\pi (s) = \underset{a}{\operatorname{argmax}} \sum_{s', r}{p(s', r|s,a)[r+\gamma V(s')]}$} 
+ \caption{Value iteration}
+ \label{alg2}
+\end{algorithm}
+
+\subsubsection*{Q-Learning \& SARSA}
+\textit{Temporal difference} (TD) learning can be seen as a combination of Monte Carlo methods and dynamic programming. That learn directly from raw experience without a model of the environment's experience \parencite{sutton1998reinforcement, arulkumaran2017brief}. The most simple TD method makes the following update:
+
+\begin{equation}
+    \label{eq:22}
+    V(S_t) \leftarrow V(S_t) + \alpha \left[R_{t+1} + \gamma V(S_{t+1} - V(S_t) \right]
+\end{equation}
+This idea is applicable both to \textit{Q-Learning} and \textit{State-action-reward-state-action} (SARSA) which are both cases of TD learning. However Q-Learning is a \textit{off-policy} method whilst SARSA is an \textit{on-policy method} \parencite{sutton1998reinforcement, arulkumaran2017brief}. Now we are interested in learning an \textit{action-value} function which we estimate with $Q^{}$, instead of a state-value function. The update rule for SARSA is given below in \autoref{eq:23}:
+
+\begin{equation}
+    \label{eq:23}
+    Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
+\end{equation}
+Q-learning instead estimates  $q_{*}$ \footnote{The optimal action-value function} with the learned action-value function $Q$ independent of the policy being followed \parencite{sutton1998reinforcement}. 
+\newpage
+The main update rule for \textit{Q-learning} is given below in 
+
+\begin{equation}
+    \label{eq:24}
+     Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[R_{t+1} + \gamma \underset{a}{\operatorname{max}} Q(S_{t+1}, a) - Q(S_t, A_t) \right]
+\end{equation}
+
+\subsubsection*{Deep Q Networks (DQN}
+In \textcite{mnih2015human} from Google DeepMind created Deep Q Learning (DQN). Which replaces the $Q$ function with a neural network called \textit{Q-network}. This method also keeps track of some observations in memory which is called \textit{experience replay} \parencite{mnih2015human}. The agents experience is stored $e_t = (s_t, a_t, r_t, s_{t+1})$ at each time step in a data set $D_t = \{e_1, ..., e_t\}$. Where on Q-learning updates the experience is drawn uniformly \parencite{mnih2015human}. They use a deep convolutional network to the approximate optimal action-value function $Q^{*}$. The Q-learning update at iteration $i$ uses the loss function in \autoref{eq:25} below:
+
+\begin{equation}
+    \label{eq:25}
+    L_i(\theta_i) = \mathbb{E}_{(s,a,r,s') \sim U(D)} \left[\left(r+ \gamma \underset{a'}{\operatorname{max}}Q(s', a', \theta_{i}^{-})-Q(s,a;\theta_i)  \right)^2 \right]
+\end{equation}
+Where $\gamma$ is the discount factor, $\theta_i$ are the parameters of the Q-network. $\theta_{i}^{-}$ is the parameters of the target network \parencite{mnih2015human}.
+
+%add full algorithm here
+
+\subsubsection*{Proximal Policy Optimization (PPO)}
+
+%add full algrotihm here
 
 \subsection{Competitive Self-Play}
+In \textcite{bansal2017emergent} mentioned that in a competitive-multi agent environment trained with self-play. Far more complex behaviours then the environment itself can emerge. In general training an agent to perform a highly complicated task requires a complicated environment, but there exists environments where behaviour of the agent is far more complex. Then the environment itself \parencite{bansal2017emergent}. These types of environments have two interesting properties:
+
+\begin{enumerate}
+    \item Very simple competitive multi-agent environments can produce extremely complex behavior
+    \item When training with self-play the environment provides the agents with  a perfect curriculum.
+\end{enumerate}
 
 %mention where it has been succesfully used and show the need of the application that we want to use here for the thesis
 \subsection{RL in Market Microstructure}
