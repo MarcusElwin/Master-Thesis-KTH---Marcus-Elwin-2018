@@ -18,6 +18,7 @@
 \newtheorem{definition}{Definition}[section]
 \newtheorem{hyp}{Hypothesis}
 \newtheorem{RQ}{Research Question}[section]
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
 \usepackage{graphicx}
 \usepackage[]{algorithm2e} %for algos
@@ -141,7 +142,7 @@ The objective for this thesis is two-fold. Firstly in the case of the principal 
 
 The background is coherent and relevant.
 \chapter{Background}
-In this chapter relevant theory is presented in order to give the reader a good overview of the fields study during the pre-study that are relevant for the thesis. We begin with .. and finally end with a section on previous related work.
+In this chapter relevant theory is presented in order to give the reader a good overview of the fields studied during the pre-study that are relevant for the thesis. Where we cover \textit{market microstructure theory, artificial financial markets, algorithmic and high frequency trading} and finally end with a section on \textit{reinforcement learning}.
 
 %Necessary
 %\section{Modern Financial Markets}
@@ -178,17 +179,31 @@ Looking at today's financial markets
 Any trading mechanism can be seen as a type of trading game in which players meet virtually or physical at some venue and act according to some rules \parencite{o1995market}. Where the players are some of the participants mentioned in the previous section. The venue or the market is trades are actually happening which can be on an exchange or via other intermediaries. A common division of market structure is presented in \textcite{foucault2013market} \textit{the limit order market} (auction market) and \textit{the dealer market}. In fact all trading mechanisms can be viewed as a variation of these \parencite{foucault2013market}.
 \newline
 \newline
-In limited order markets, the final investors interact directly; there bids and offers are accumulated in the \textit{limited order book} (LOB). By price priority and secondly time priority \parencite{hasbrouck2007empirical}. Whilst in dealer markets participants can only trade at the bid and ask quotes posted by specialized intermediaries i.e. \textit{dealers} or \textit{market makers} \parencite{foucault2013market}. Note that the LOB is very dynamic as it constitutes of \textit{limit orders}\footnote{A limit order is an order that specifies a direction, quantity and acceptable price.}. Which can be cancelled or modified at any time, thus the LOB can change be changed extremely rapid \parencite{hasbrouck2007empirical}. An example of a limit order book is shown below in \autoref{fig:2}.
+In limited order markets, the final investors interact directly; there bids and offers are accumulated in the \textit{limited order book} (LOB). By price priority and secondly time priority \parencite{hasbrouck2007empirical}. Whilst in dealer markets participants can only trade at the bid and ask quotes posted by specialized intermediaries i.e. \textit{dealers} or \textit{market makers} \parencite{foucault2013market}. Note that the LOB is very dynamic as it constitutes of \textit{limit orders}\footnote{A limit order is an order that specifies a direction, quantity and acceptable price.}. Which can be cancelled or modified at any time, thus the LOB can change be changed extremely rapid \parencite{hasbrouck2007empirical}. 
+
 \begin{figure}[H]
     \centering
     \includegraphics[scale=.65]{LOBex.PNG}
     \caption{Snapshot of the LOB for the ticker ORCL (Oracle) after the 10 000th event during that day. Blue bars indicates sell limit orders, whilst red bars are buy limit orders.}
     \label{fig:2}
 \end{figure}
-Market orders are other types of orders found on LOB markets, which are usually considered to be more aggressive. This as they seek to execute a trade immediately \parencite{cartea2015algorithmic}. For instance if a market order is placed and the quantity is larger then quantity available in the book. The order is \textit{re-routed} or sad to 'walk the book' until the order is filled \parencite{hasbrouck2007empirical,cartea2015algorithmic}.To make things more complicated modern markets has a lot of different order types. Such as \textit{hidden, reserved, iceburg} and \textit{Fill-or-Kill} orders just to mention a few. Where \parencite{foucault2013market, cartea2015algorithmic, hasbrouck2007empirical} gives a good overview of these. There also exist \textit{hybrid markets} which are traditional quote-driven markets as Nasdaq and London Stock Exchange (LSE) \parencite{foucault2013market}.
+
+More formally according to \textcite{bouchaud2018trades} we can see an order as a tuple consisting of sign/direction ($\varepsilon_{x}$), price ($p_{x}$), volume ($v_{x}$) and submission time ($t_{x}$):
+\begin{equation}
+    \label{eq:0}
+    x = (\varepsilon_{x}, p_{x}, v_{x}, t_{x})
+\end{equation} Where $\varepsilon = \pm 1$ indicates if it is a buy or sell order and $v_{x} > 0$.. An example of a limit order book is shown above in \autoref{fig:2}. Market orders are other types of orders found on LOB markets, which are usually considered to be more aggressive. This as they seek to execute a trade immediately \parencite{cartea2015algorithmic}. For instance if a market order is placed and the quantity is larger then quantity available in the book. The order is \textit{re-routed} or sad to 'walk the book' until the order is filled \parencite{hasbrouck2007empirical,cartea2015algorithmic}.
+\newline
+\newline
+When submitting an order $x$, the trader must chose the size $v_x$ and price $p_{x}$ according to a relevant \textit{lot size} and \textit{tick size} of the LOB \parencite{bouchaud2018trades}. The lot size $v_0$ is the smallest amount of the asset that can be trades. Hence the size of each order is a multiple of the lot size $v_{x} \in \{kv_{0} | k = 1,2,...\}$. The tick size $\vartheta$ is the smallest permissible price interval between different order within a given LOB \parencite{bouchaud2018trades}. The values of $v_{0}$ and $\vartheta$ differs a lot between exchanges. However expensive stocks are often traded with $v_0 = 1$ whilst cheaper stocks are traded with $v_{0} \gg 1$. In equity markets $\vartheta$ is often 0.01\% of the stocks's mid-price \parencite{bouchaud2018trades}. 
+\newline
+\newline
+Both the tick size and lot size affect trading. As the lot size dictates the smallest permissible order size. Whilst the tick size $\vartheta$ dictates how much more expensive it is for a trader to gain the priority. Of choosing a higher or lower price to a buy or sell order \parencite{bouchaud2018trades}. Sometimes it is also useful to consider the \textit{relative tick size} $\vartheta_r$, which is equal to the $\vartheta$ divided by the mid-price for a given asset \parencite{bouchaud2018trades}. To make things more complicated modern markets has a lot of different order types. Such as \textit{hidden, reserved, iceburg} and \textit{Fill-or-Kill} orders just to mention a few. Where \parencite{foucault2013market, cartea2015algorithmic, hasbrouck2007empirical} gives a good overview of these. There also exist \textit{hybrid markets} which are traditional quote-driven markets as Nasdaq and London Stock Exchange (LSE) \parencite{foucault2013market}.
 
 \subsection{Price Formation \& Discovery}
+
 The mechanism of price formation is at the very heart of economics.  Which is also important to understand 'stylized facts' in financial price series as \textit{heavy tails} and \textit{volatility clustering}  \parencite{abergel2012market}. \text{Price discovery} is the speed and accuracy with which transactions prices incorporate information available to market participants \parencite{foucault2013market}. In fact market makers, professional traders who stand willing to buy or sell securities. Is a logical starting point for how prices are actually determined in the market \parencite{madhavan2000market}. Another key is also the role of information and who has it, that will be covered more in section .. \parencite{cartea2015algorithmic}.
+
 
 \begin{figure}[H]
     \centering
@@ -196,6 +211,7 @@ The mechanism of price formation is at the very heart of economics.  Which is al
     \caption{Three components of bid-ask spread in short-term and lon-term response to a market buy order. Source: \textcite{foucault2013market}}
     \label{fig:3}
 \end{figure}
+
 
 \subsubsection*{Bid-Ask Spread}
 
@@ -231,14 +247,12 @@ Another related measure is the so called \textit{relative weighted average bid-a
 \label{eq:4}
     RTWAS_{t} = \frac{\bar{a}(q) - \bar{b}(q)}{S_t}
 \end{equation}
-Where $\bar{a}(q)$ and $\bar{b}(q)$ is the average execution price for buy and sell market orders of size $q$ \parencite{foucault2013market}. On the other hand the effective spread or half-spread measures the realized difference between the price paid and the midprice. Which can also be negative indicating that one is buying at a price below or selling above the 'market price' \parencite{cartea2015algorithmic}. ES and QS differ in the fact that ES can only be measured when there is a trade while QS are always observable \parencite{cartea2015algorithmic}.Some stylized facts know about the bid-ask spread are \parencite{hasbrouck2007empirical, madhavan2002market}:
+Where $\bar{a}(q)$ and $\bar{b}(q)$ is the average execution price for buy and sell market orders of size $q$ \parencite{foucault2013market}. On the other hand the effective spread or half-spread measures the realized difference between the price paid and the midprice. Which can also be negative indicating that one is buying at a price below or selling above the 'market price' \parencite{cartea2015algorithmic}. ES and QS differ in the fact that ES can only be measured when there is a trade while QS are always observable \parencite{cartea2015algorithmic}. Some stylized facts know about the bid-ask spread are \parencite{hasbrouck2007empirical, madhavan2002market, bouchaud2018trades}:
 \begin{itemize}
-    \item The trade prices series is a martingale
-    \item The order flow is not symmetric
-    \item The spread declines over time
-    \item The bid-ask spread are lower in high volume securities and wider for more riskier securities.
-    \item The orders are serially correlated
-    \item There is a price impact of trades
+    \item The trade prices series is a martingale \& the order flow is not symmetric
+    \item The spread declines over time \& the bid-ask spread are lower in high volume securities and wider for more riskier securities.
+    \item For large-tick stock, the spread is almost equal to on tick. Small-tick stocks have a broader distribution of spreads.
+    \item There is a price impact of trades i.e. on average the arrival of a buy trade causes prices to rise ($S_t$ increases). Whilst the arrival of sell trades causes prices to fall ($S_t$ decreases).
 \end{itemize}
 
 \subsubsection*{Liquidity}
@@ -251,13 +265,13 @@ A popular benchmark in trading costs analysis is the \textit{volume-weighed aver
     \label{eq:5}
     VWAP = \sum_{t\in T}{w_t p_t}
 \end{equation}
-Where $w_t = \frac{|q_t|}{\sum_{t\in T}{|q_t|}}$ and $p_t$ and $q_t$ is the price and size of the $t^{th}$ trade. Investors evaluate their broker's performance in getting a good price for their order, by comparing their own price with the day's VWAP \parencite{foucault2013market}. Another concern for participants that wish to execute large orders, is that they will have an adverse \textit{price impact}. That is, increasing the price when buying aggressively and lowering it when selling \parencite{cartea2015algorithmic}. A normal way of measuring this, is running a regression on the change of the midprice of the form below:
+Where $w_t = \frac{|q_t|}{\sum_{t\in T}{|q_t|}}$ and $p_t$ and $q_t$ is the price and size of the $t^{th}$ trade. Investors evaluate their broker's performance in getting a good price for their order, by comparing their own price with the day's VWAP \parencite{foucault2013market}. Another concern for participants that wish to execute large orders, is that they will have an adverse \textit{price impact}. That is, increasing the price when buying aggressively and lowering it when selling \parencite{cartea2015algorithmic, bouchaud2018trades}. A normal way of measuring this, is running a regression on the change of the midprice of the form below:
 
 \begin{equation}
     \label{eq:6}
     \Delta S_n = \lambda q_n + \varepsilon_n
 \end{equation}
-where the parameter $\lambda$ is capturing the market's price reaction i.e. its price impact. On the other hand $q_n$ is the order imbalance or net order flow \footnote{difference between of buy and sell orders during an interval} and  $\varepsilon_n$ assumed to be normal \parencite{cartea2015algorithmic, foucault2013market}. In terms of measuring liquidity a lower $\lambda$ indicates that the market is more liquid. Due to greater competition, lower risk tolerance or lower volatility \parencite{cartea2015algorithmic}. Thus meaning that a lower $\lambda$ means that prices are less sensitive to order imbalance \parencite{foucault2013market}.    
+Where $\Delta S_n = S_{n\tau}-S_{(n-1)\tau}$ for a time interval $[(n-1)\tau, n\tau]$ \parencite{cartea2015algorithmic}. Using \autoref{eq:6} we can then estimate $\lambda$. Where the parameter $\lambda$ also called \textit{Kyle's lambda} \parencite{bouchaud2018trades} is capturing the market's price reaction i.e. its price impact. On the other hand $q_n$ is the order imbalance or net order flow \footnote{difference between of buy and sell orders during an interval} and  $\varepsilon_n$ the error term assumed to be normally distributed \parencite{cartea2015algorithmic, foucault2013market}. In terms of measuring liquidity a lower $\lambda$ indicates that the market is more liquid. Due to greater competition, lower risk tolerance or lower volatility \parencite{cartea2015algorithmic}. Thus meaning that a lower $\lambda$ means that prices are less sensitive to order imbalance \parencite{foucault2013market}.  A larger $\lambda$ indicates that the given volume impacts the prices, and trading is thus more expensive \parencite{bouchaud2018trades}.
 
 \subsection{Inventory-based models}
 A large (positive) inventory causes the dealer or market maker to face a higher cost for observing more inventory. Which lowers both bid and ask prices by the same amount \parencite{o1995market}. Vice versa holds for negative inventory. 
@@ -297,13 +311,65 @@ Finally base wealth ($Y$) is given by:
     \label{eq:11}
     dY = r_{Y}Ydt+YdZ_{Y} 
 \end{equation}
-The objective of the dealer is now to maximize the expected utility of his otal wealth $E[U(W_T)]$ at time horizon $T$, where 
+The objective of the dealer is now to maximize the expected utility of his total wealth $E[U(W_T)]$ at time horizon $T$, where 
 
 \begin{equation}
     \label{eq:12}
     W_{T} = F_{T} + I_{T} + Y_{T}
 \end{equation}
-\autoref{eq:12} is what is termed \textit{the dealers pricing problem}. This is in fact an optimization problem where we want to maximise the value function $J(\cdot)$
+\autoref{eq:12} is what is termed \textit{the dealers pricing problem}. This is in fact an optimization problem where we want to maximize the value function $J(\cdot)$ using dynamic programming. We have thus the optimization below in \autoref{eq:13a}
+
+\begin{equation}
+    \label{eq:13a}
+    J(t,F,I,Y) = \underset{a,b}{\max}[E[U(W_T)] | t,F,I,Y]
+\end{equation}
+where $U$ is the utility function, $a$ and $b$ are the ask and bid adjustments and $t, F, I,Y$ are the states variables time, cash, inventory and base wealth \parencite{o1995market}. The function $J(\cdot)$ gives the level of utility given that the dealer's decisions are made optimally \parencite{o1995market}. As there are no intermediate consumption before time $T$ in this model. The recurrence relation found by using the principle of optimality is:
+
+\begin{equation}
+    \label{eq:13bc}
+    \underset{a,b}{\max}dJ(t,F,I,Y)=0 \text{ and } 
+    J(T,F,I,Y)=U(W_T)
+\end{equation}
+Solving \autoref{eq:13bc} finds a solution to the dealer's problem, where we have to find the ask and bid prices for each state. To solve \autoref{eq:13bc} one requires to use stochastic calculus. By writing out the partial differential equations that \autoref{eq:13bc} implies and apply Ito's Lemma:
+
+\begin{align*}
+    \label{eq:13d}
+    \underset{a,b}{max}(dJ/dt) = & J_t + LJ \\
+    & + max\{\lambda_a[J(F+pQ+aQ, I-pQ,Y) - J(F,I,Y)] \\
+    & + \lambda_b [J(F-pQ+bQ, I+pQ,Y) - J(F,I,Y)] \} = 0 \numberthis
+\end{align*}
+where $J_t$ is the time derivative and $L$ is the operator defined as
+
+\begin{equation}
+    LJ = J_{F}rF + J_{I}r_{I}I+J_{Y}r_{y}Y+\frac{1}{2}J_{II}\sigma^{2}_{I}I^{2}+ \frac{1}{2}J_{YY}\sigma^{2}_{Y}Y^{2} + J_{IY}\sigma_{IY}IY
+\end{equation}
+$J_t + LJ$ is the total time derivative of derived utility when there are no transactions. \autoref{eq:13d} determines the solution, but is hard to solve explicitly. \textcite{ho1981optimal} do not solve the general problem but introduces some transformations and simplifications in order to solve it. Firstly by looking at the problem only at the endpoint ($\tau$) is equal to zero. Secondly \parencite{o1995market} .. and define two new operators sell ($S$) and buy ($B$) operators:
+\begin{align}
+    \label{eq:13e}
+    SJ = & S[J(F,I,Y)] = J(F+Q,I-Q, Y) \\
+    BJ = & B[J(F,I,Y)] = J(F-Q, I+Q, Y)
+\end{align}
+
+By using the new operators the problem in \autoref{eq:13d} can be rewritten as
+
+Which gives the bid and ask prices
+\begin{align}
+\label{eq:13f}
+    b^{*} = & \alpha/2\beta + (J-BJ)/2BJ_{F}Q \\
+    a^{*} = & \alpha/2\beta + (J-SJ)/2SJ_{F}Q \label{eq:13g}
+\end{align}
+From \autoref{eq:13f} and \autoref{eq:13g} we get the bid-ask spread as
+\begin{equation}
+    \label{eq:13h}
+    s = \alpha / \beta + (J-SJ)/2SJ_{F}Q + (J-BJ)/2BJ_{F}Q
+\end{equation}
+\textcite{ho1981optimal} demonstrates three important properties of the dealer's optimal pricing behavior:
+
+\begin{enumerate}
+    \item The spreads depends on the time horizon of the dealer
+    \item The spread can be decomposed into a risk neutral spread plus an adjustment for uncertainty
+    \item The spread is independent of inventory level.
+\end{enumerate}
 
 \subsection{Information-based models}
 
@@ -327,9 +393,28 @@ Note that the Glosten-Milgrom model has no actual auction mechanism. Which makes
 
 %\subsection{Empirical metrics}
 
-\section{Artificial Financial Markets}
-In agent-based modelling, appropriate parts of the complex system are modeled as autonomous decision-making entities called \textit{agents} \parencite{darley2007nasdaq}
+\newpage
 
+\section{Artificial Financial Markets}
+In agent-based modelling (ABM), appropriate parts of the complex system are modeled as autonomous decision-making entities called \textit{agents} \parencite{darley2007nasdaq}. In ABM market investors or traders are modelled as agents trading together via an orderbook \parencite{lussange2018bright}. However the decision of what type of agents to use is paramount. Where a wide range of of different types of agents from \textit{zero-intelligence agents} to \textit{reinforcement learning agents} \parencite{martinez2009evolutionary}. Broadly speaking there is a price disagreement between the agents, where often pricing is done randomly also called \textit{noise traders}. Or via some real world strategy \parencite{lussange2018bright}. According to \textcite{martinez2009evolutionary} some important design issues to think about are:
+
+\begin{itemize}
+    \item \textit{Decision making} i.e. is it rule based, or based on something else.
+    \item \textit{Objective function} i.e. explicit, implicit or utility or profit maximization.
+    \item \textit{Heterogeneity} i.e. types of agents, parameters, information basis and learning.
+    \item \textit{Learning} i.e. zero intelligence or more complex.
+\end{itemize}
+Validation is an important issue in agent-based modelling, where simulated markets should be able to replicate realistic quantitative features of the real market, with reasonable calibration \parencite{martinez2009evolutionary}. In order to validate multiple parameters need to be user defined. However to overcome this, using a benchmark in which the behaviour of the market is well defined is on way. Another way according to \textcite{martinez2009evolutionary} is to use parameters in the simulated market derived from experimental or real markets. 
+\newline
+\newline
+It is also common to test whether the prices created via the interaction of the agents exhibit certain \textit{stylized facts}. That real world markets do \parencite{brandouy2011design}. With stylized facts we mean a set of properties that is common across many instruments, markets and times. That has been observed by independent studies \parencite{cont2001empirical}. Where some of the know stylized facts important for this study are:
+
+\begin{itemize}
+    \item \textit{Absence of autocorrelations} i.e. linear autocorrelations are often insignificant. 
+    \item \textit{Non Gaussian returns \& Heavy tails} i.e.the unconditional distribution of returns seems to display a power-law or Pareto-like tail.
+    \item \textit{Volatility clustering}. 
+\end{itemize}
+For more information see for instance \textcite{cont2001empirical}.
 
 %mention what it is, some strategies, and how it effect modern markets
 \section{Algorithmic and High-Frequency Trading}
@@ -339,6 +424,15 @@ Algorithmic trading consists in using computer programs to implement investment 
 A distinction can be made between algorithmic trading and HFT in their order frequency. Where HFT can enter more than thousands of orders per second, while algorithmic trading enters a few orders per minute \parencite{abergel2012market}.
 
 \subsection{Different types of strategies}
+
+\subsubsection*{Optimal Executions}
+
+\subsubsection*{Targeting volume}
+
+\subsubsection*{Market Making}
+
+\subsubsection*{Pairs Trading \& Statistical Arbitrage}
+\textit{Pairs trading} is a portfolio that consists of a linear combination of two assets that are traded \parencite{cartea2015algorithmic}. At the heart of the strategy is how the two assets co-move. Pairs trading algorithms profit from betting on the fact that spread deviations tend to return to historical or predictable levels \parencite{cartea2015algorithmic}. Which makes it fall under the class of strategies called \textit{statistical arbitrage}.
 
 \subsection{Cost and benefits}
 
@@ -542,7 +636,10 @@ Where $c_1,c_2$ are coefficients, and S is an entropy bonus. $L_{t}^{CLIP}$ is t
 %add full algorithm here
 
 \subsection{Competitive Self-Play}
-Many real-world applications can be described as large-scale of games of imperfect information. A game is a domain of conflict for cooperation between several entities \parencite{heinrich2016deep}. Where the optimal solutions for these types of situations would be Nash equilibrium. That is an strategy from which no agent would choose to deviate \parencite{heinrich2016deep}. This is where self-play comes in, which is based on the idea of \textit{fictitious play}. This is where fictitious players choose best responses to their opponents' average behaviour \parencite{heinrich2016deep}. In \textit{Fictious Self-Play} (FSP) on the other hand the agents generate datasets of their experience in self-play \parencite{heinrich2016deep}.  Each agent stores transition tuples $(s_t, a_t, r_{t+1}, s_{t+1})$ in a memory $\mathcal{M}_{RL}$ for reinforcement learning (confer experience replay). Experience of the agent's own behaviour $(s_t, a_t)$ is stored in a separate memory for supervised learning $\mathcal{M}_{SL}$ \parencite{heinrich2016deep}.
+Many real-world applications can be described as large-scale of games of imperfect information. A game is a domain of conflict for cooperation between several entities \parencite{heinrich2016deep}. Where the optimal solutions for these types of situations would be Nash equilibrium. That is an strategy from which no agent would choose to deviate \parencite{heinrich2016deep}. This is where self-play comes in. In short self-play is the activity of imagining or simulating the play of a game against oneself \parencite{heinrich2017reinforcement}. This concept is also based on the idea of \textit{fictitious play}.  Where fictitious players choose best responses to their opponents' average behaviour \parencite{heinrich2016deep}. 
+\newline
+\newline
+\textcite{tampuu2017multiagent} also mentioned that self-play is any type of play against an \textit{adaptive agent}. Typically agents are first trained in a supervised manor, with self-play as a second phase of training. In \textit{Fictious Self-Play} (FSP) on the other hand the agents generate datasets of their experience in self-play \parencite{heinrich2016deep}.  Each agent stores transition tuples $(s_t, a_t, r_{t+1}, s_{t+1})$ in a memory $\mathcal{M}_{RL}$ for reinforcement learning (confer experience replay). Experience of the agent's own behaviour $(s_t, a_t)$ is stored in a separate memory for supervised learning $\mathcal{M}_{SL}$ \parencite{heinrich2016deep}.
 \newline
 \newline
 \textcite{bansal2017emergent} mentioned that in a competitive-multi agent environment trained with self-play. Far more complex behaviours then the environment itself can emerge. In general training an agent to perform a highly complicated task requires a complicated environment, but there exists environments where behaviour of the agent is far more complex. Then the environment itself \parencite{bansal2017emergent}. These types of environments have two interesting properties:
@@ -554,6 +651,8 @@ Many real-world applications can be described as large-scale of games of imperfe
 
 %mention where it has been succesfully used and show the need of the application that we want to use here for the thesis
 %\subsection{RL in Market Microstructure}
+
+\newpage
 
 \subsection{Issues with deep RL}
 
@@ -617,15 +716,41 @@ Nevertheless, in order to train the agents in the trading environments, we need 
 
 \section{Overview}
 
-\section{Data}
+%add flowchart here
+
+\section{Environments \& Data}
+Even-though if OpenAI gym provides a lot of great environments to start with. We had to build our own OpenAI environments used throughout the thesis. These are implemented following the papers presented in the background section from \textcite{ho1981optimal} and .. The environments that will be presented are \textit{DealerMarket-v0, DealerMarket-v1, ...}
+
+\subsection{DealerMarket-v0}
+
+\subsection{DealerMarket-v1}
+
 
 \section{Software \& Hardware}
+
+\subsection{OpenAI Gym \& Baselines}
+OpenAI Baselines is a state-of-the-art library used for research and testing of different reinforcement learning algorithms created by \textcite{baselines}. From the library these work uses the following algorithms \textit{DQN, PPO2, HER} and ..
+
+\subsection{keras-RL}
+
+\subsection{Tensorforce}
+
+\subsection{AWS}
 
 \section{Evaluation}
 
 \section{Validation}
 
 \chapter{Results}
+
+\section{DealerMarket-v0}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.4]{test_Exim_v3_2M.png}
+    \caption{Graphs for episode reward, loss function and mean absolute error. After training agent for two million steps.}
+    \label{fig:dm1}
+\end{figure}
 
 \chapter{Discussion \& Conclusions}
 
