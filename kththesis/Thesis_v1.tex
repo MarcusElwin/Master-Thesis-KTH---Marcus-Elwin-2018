@@ -8,6 +8,7 @@
 
 %added by me:
 \usepackage{xcolor}
+\usepackage{tikz}
 \usepackage{color}
 \usepackage{amsmath,float}
 \usepackage{amssymb}
@@ -105,12 +106,7 @@ However as mentioned by \textcite{o2015high} due to HFT and algoritmic trading. 
 Where recent achievements for the use of Reinforcement Learning has been seen in the game Go with \textit{AlphaGo, AlphaGoZero} \parencite{silver2016mastering} programs being able to win over esteemed Go champions. More complicated strategic games as Star Craft has also seen successful application of reinforcement learning \parencite{vinyals2017starcraft}. Therefore the focus of this thesis will be to examine the possibility of using deep reinforcement learning and competitive self-play. In order to understand the market microstructure on a simulated Nordic stock market.
 
 %need to work with
-\section{Research Question}
-The research question for this thesis is shown below:
-
-\begin{RQ}
-Will trading dynamics such as the bid-ask spread clustering, optimal trade execution and optimal inventory costs be exhibited \& learned by reinforcement learning agents using competitive self-play on a simulated Nordic stock market.
-\end{RQ}
+%\section{Research Question}
 
 \section{Problem}
 With more granular and high frequency data as well as more sophisticated trading algorithms. The financial markets has become harder to understand during the past decade. Traditional methods used in market microstructure might have become obsolete as mentioned in \textcite{o2015high}. A traditional supervised learning approach is not of use for this thesis. Due to the fact of the financial markets dynamic nature as a complex system. The agents must be able to adapt and dynamically learn optimal behaviour.  Therefore the problem in this thesis is to understand by using reinforcement learning, specially learning via competitive self-play. On a simulated Nordic stock market. 
@@ -277,16 +273,7 @@ Where $\Delta S_n = S_{n\tau}-S_{(n-1)\tau}$ for a time interval $[(n-1)\tau, n\
 A large (positive) inventory causes the dealer or market maker to face a higher cost for observing more inventory. Which lowers both bid and ask prices by the same amount \parencite{o1995market}. Vice versa holds for negative inventory. 
 
 \subsubsection*{Ho \& Stoll Model}
-In \textcite{ho1981optimal} a model that handles the risk the market maker faces when providing his service is presented. In the model the following assumptions are made:
-
-\begin{itemize}
-    \item Transactions follow a stationary continuous time stochastic jump process i.e. a Poisson process. 
-    
-    \item The arrival rate of buy orders ($\lambda_a$) and sell orders ($\lambda_b$) will depend on the dealer's ask and bid prices.
-    
-    \item The dealer face uncertainty over the future value of his portfolio $X$
-\end{itemize}
-In the the absence of any transactions the portfolio growth $dX$ is given below:
+In \textcite{ho1981optimal} a model that handles the risk the market maker faces when providing his service is presented. In the model the following assumptions are made: \textit{transactions follow a Poisson process, the dealer faces uncertainty over the future and, the arrival rate of orders depend on the bid and ask prices}. In the the absence of any transactions the portfolio growth $dX$ is given below:
 
 \begin{equation}
     \label{eq:8}
@@ -304,7 +291,7 @@ Which changes with buys and sells of securities earning the risk-free rate $r$. 
     \label{eq:10}
     dI = r_{I}Idt+pdq_{b} - pdq_{a} + IdZ_{I}
 \end{equation}
-The inventory consists of shares in the stock tha market maker makes.
+The inventory consists of shares in the stock the market maker makes.
 Finally base wealth ($Y$) is given by:
 
 \begin{equation}
@@ -330,46 +317,30 @@ where $U$ is the utility function, $a$ and $b$ are the ask and bid adjustments a
     \underset{a,b}{\max}dJ(t,F,I,Y)=0 \text{ and } 
     J(T,F,I,Y)=U(W_T)
 \end{equation}
-Solving \autoref{eq:13bc} finds a solution to the dealer's problem, where we have to find the ask and bid prices for each state. To solve \autoref{eq:13bc} one requires to use stochastic calculus. By writing out the partial differential equations that \autoref{eq:13bc} implies and apply Ito's Lemma:
+Solving \autoref{eq:13bc} one finds a solution to the dealer's problem. Where we have to find the ask and bid prices for each state. To solve \autoref{eq:13bc} one requires to use stochastic calculus. By writing out the partial differential equations that \autoref{eq:13bc} implies and applying Ito's Lemma one gets the problem in a new form. Namely \autoref{eq13e2}:
 
 \begin{align*}
-    \label{eq:13d}
-    \underset{a,b}{max}(dJ/dt) = & J_t + LJ \\
-    & + max\{\lambda_a[J(F+pQ+aQ, I-pQ,Y) - J(F,I,Y)] \\
-    & + \lambda_b [J(F-pQ+bQ, I+pQ,Y) - J(F,I,Y)] \} = 0 \numberthis
+    \label{eq13e2}
+    J_{t} = & LJ + \underset{a,b}{max}\{[\lambda(a)aQSJ_{F} - \lambda(a)(J-SJ)] + \\
+    & [\lambda(b)bQBJ_{F} - \lambda(b)(J-BJ)]\} 
+    \numberthis
 \end{align*}
-where $J_t$ is the time derivative and $L$ is the operator defined as
+where $\lambda(a) = \alpha - \beta_{A}$ and $\lambda(b) = \alpha + \beta_{B} $ is symmetric linear supply and demand functions to the dealer. For further elaboration and more details see \autoref{app:B}. However, there is no closed form solution for this problem but via approximations the bid and ask quotes has been shown to be found by:
 
-\begin{equation}
-    LJ = J_{F}rF + J_{I}r_{I}I+J_{Y}r_{y}Y+\frac{1}{2}J_{II}\sigma^{2}_{I}I^{2}+ \frac{1}{2}J_{YY}\sigma^{2}_{Y}Y^{2} + J_{IY}\sigma_{IY}IY
-\end{equation}
-$J_t + LJ$ is the total time derivative of derived utility when there are no transactions. \autoref{eq:13d} determines the solution, but is hard to solve explicitly. \textcite{ho1981optimal} do not solve the general problem but introduces some transformations and simplifications in order to solve it. Firstly by looking at the problem only at the endpoint ($\tau$) is equal to zero. Secondly \parencite{o1995market} .. and define two new operators sell ($S$) and buy ($B$) operators:
-\begin{align}
-    \label{eq:13e}
-    SJ = & S[J(F,I,Y)] = J(F+Q,I-Q, Y) \\
-    BJ = & B[J(F,I,Y)] = J(F-Q, I+Q, Y)
-\end{align}
-
-By using the new operators the problem in \autoref{eq:13d} can be rewritten as
-
-Which gives the bid and ask prices
 \begin{align}
 \label{eq:13f}
     b^{*} = & \alpha/2\beta + (J-BJ)/2BJ_{F}Q \\
     a^{*} = & \alpha/2\beta + (J-SJ)/2SJ_{F}Q \label{eq:13g}
 \end{align}
-From \autoref{eq:13f} and \autoref{eq:13g} we get the bid-ask spread as
+Finally from \autoref{eq:13f} and \autoref{eq:13g} we get the bid-ask spread as
 \begin{equation}
     \label{eq:13h}
     s = \alpha / \beta + (J-SJ)/2SJ_{F}Q + (J-BJ)/2BJ_{F}Q
 \end{equation}
-\textcite{ho1981optimal} demonstrates three important properties of the dealer's optimal pricing behavior:
-
-\begin{enumerate}
-    \item The spreads depends on the time horizon of the dealer
-    \item The spread can be decomposed into a risk neutral spread plus an adjustment for uncertainty
-    \item The spread is independent of inventory level.
-\end{enumerate}
+The first term of \autoref{eq:13h} is the spread which maximizes the expected returns from selling and buying stocks. Whilst the rest of the terms are seen as \textit{risk premiums} for sale and purchase transactions. This as the dealer or market maker sets the spread without knowing what side the transaction will have i.e. bid or ask \parencite{ho1981optimal}.
+\newline
+\newline
+\textcite{ho1981optimal} demonstrates three important properties of the dealer's optimal pricing behavior: \textit{the spreads depends on the time horizon of the dealer, it can be decomposed in a risk-neutral and risk part, and the spread is independent of inventory level.}
 
 \subsection{Information-based models}
 
@@ -389,7 +360,7 @@ Informed traders have information about the realization of a assets \textit{true
 And by using Bayes' rule the probabilities  can be obtained, for instance $P[V=\overline{V}|\text{Sell}] = \frac{\theta(1-\mu)\gamma^{S}}{(1-\mu)\gamma^{S} + (1-\theta)\mu}$.
 Note that the Glosten-Milgrom model has no actual auction mechanism. Which makes the model inadequate for studying the effect of microstructure on non-equilibrium market behavior \parencite{darley2007nasdaq}.
 
-\subsubsection*{Das Model}
+%\subsubsection*{Das Model}
 
 %\subsection{Empirical metrics}
 
@@ -426,15 +397,35 @@ A distinction can be made between algorithmic trading and HFT in their order fre
 \subsection{Different types of strategies}
 
 \subsubsection*{Optimal Executions}
+A classic problem in finance is how an agent can sell or buy a large amount of shares, but yet minimize the adverse price movements. Which is a consequence of trading a too large trade \parencite{cartea2015algorithmic}. So what traders often do is that they divided the larger \textit{parent} order into smaller \textit{child} orders over time, using a broker. Hence the agent must formulate a model to decide how to find the optimal cost of executing the trade(s). Where executions costs calculated as the difference between a benchmark price and the actual prices\footnote{average price per share} \parencite{cartea2015algorithmic}. Often the midprice is used as a benchmark. Where a strategy using this is \textit{implementation shortfall} \parencite{cartea2015algorithmic}. There also exists other approaches based on time weighed average prices (TWAP).
 
 \subsubsection*{Targeting volume}
+Trading algorithms that target benchmarks based on volume are extensively used. Where one of the most popular benchmarks is the Volume Weighted Average Price (VWAP) \parencite{cartea2015algorithmic}. Which is calculated as:
 
-\subsubsection*{Market Making}
+\begin{equation}
+    \label{eq:at1}
+    VWAP(T_1, T_2) = \frac{\int_{T_1}^{T_2}{S_t dV_t}}{\int_{T_1}^{T_2}{dV_t}}
+\end{equation}
+where $V_t$ is the total volume executed up to time $t$. $S_t$ is the midprice, and $[T_1, T_2]$ is the interval which VWAP is measured over \parencite{cartea2015algorithmic}. However targeting VVWAP is not easy, as one cannot know ahead of time how many shares that will be traded. Therefore some strategies target a fraction of the rate of trading instead \parencite{cartea2015algorithmic}, such as percentage of volume (POV) and percentage of cumulative volume (POCV).
+
+%\subsubsection*{Market Making}
 
 \subsubsection*{Pairs Trading \& Statistical Arbitrage}
 \textit{Pairs trading} is a portfolio that consists of a linear combination of two assets that are traded \parencite{cartea2015algorithmic}. At the heart of the strategy is how the two assets co-move. Pairs trading algorithms profit from betting on the fact that spread deviations tend to return to historical or predictable levels \parencite{cartea2015algorithmic}. Which makes it fall under the class of strategies called \textit{statistical arbitrage}.
 
+\subsubsection*{Predatory algorithms}
+Large cancellation rates of orders in the orderbook. From for instance algorithmic traders may be indicative of low liquidity. This as participants publish quotes without the intent of getting them filled in the orderbook \parencite{de2018advances}. \textcite{de2018advances} mentioned four different categories for such \textit{predatory behaviour}:
+
+\begin{enumerate}
+    \item \textit{Qoute stuffers:} whom engage in ''latency arbitrage''. By overwhelming an exchange with messages with the sole purpose of slowing down competing algorithms.
+    \item \textit{Qoute danglers:} this strategy force a squeezed trader to chase a price against here interests. 
+    \item \textit{Liquidity squeezers:} when a large investor is forced to unwind here position. Algorithms trade in the same direction i.e. draining as much liquidity as possible. 
+    \item \textit{Pack hunters:} Predators hunting independently become aware of other activities and form pacts. In order to maximize the chance of triggering a cascading effect.   
+\end{enumerate}
+Some ways of measuring this is according to \textcite{de2018advances} to measure the cancellation rates of quotes, limit orders and market orders.
+
 \subsection{Cost and benefits}
+According to \textcite{kissell2013science} algorithmic trading a variety of benefits for investors such \textit{Lower commissions}, \textit{Anonymity}, \textit{Control}, {Reduced Transaction Costs} and \textit{Transparency}. Whilst main disadvantages according to \textcite{kissell2013science} is a more difficult price discovery.
 
 \section{Reinforcement Learning}
 Reinforcement learning (RL) is learning what to do i.e. map situations to actions, in order to maximize a numerical reward function \parencite{sutton1998reinforcement}. Which is quite different from other machine learning methods based on \textit{supervised} or \textit{unsupervised} learning, where one in fact have the true labels or not.
@@ -655,7 +646,18 @@ Many real-world applications can be described as large-scale of games of imperfe
 \newpage
 
 \subsection{Issues with deep RL}
+There's a lot of hype around using reinforcement learning, and specially deep reinforcement learning. Which is the closes that we have today to \textit{Artificial General Intelligence}. Some of the major issues are presented below:
 
+\begin{enumerate}
+    \item \textit{Deep RL can be sample inefficient}. Reinforcement learning has its own planning fallacy. Learning a policy usually needs more sample then what one thinks \parencite{irpan_2018}. Simulations run on the popular MuJoCo physics environment need for instance between $[10^5, 10^7]$ steps to learn different task \parencite{heess2017emergence}.
+    
+    \item \textit{Performance compared to other methods}. In theory RL can work for everything, including experiments where a model of the world is not know. Which comes at a cost. That it's hard to exploit any problem specific information, that could help learning \parencite{irpan_2018}. The rule-of-thumb is that domain-specific algorithms tend to work better and faster then RL. Except for rare cases.
+    
+    \item \textit{Reward design is hard}. It seems to be hard to design a reward function, that encourages the behaviour one wants the agent to learn. Bad designed rewards can lead to overfitting of the agent to the reward. Which is way it is important to design a relevant reward signal \parencite{sutton1998reinforcement, irpan_2018}. Often \textit{shaped rewards}\footnote{increasing rewards in states that are close to the end goal} are easier to learn compared to \textit{sparsed rewards}\footnote{only gives reward in goal state}. Some possible remedies however are to use sparsed rewards or careful shaping of the reward \parencite{irpan_2018}
+    
+    \item \textit{Generalization}. If you want to do good in one specific environment you are free to overfit. However generalizing an agent to another environment, would result in bad results \parencite{irpan_2018}. Meaning that transfer learning is not easy to archive. 
+    
+\end{enumerate}
 
 %necessary?
 %\section{Tree Search}
@@ -712,45 +714,295 @@ A previous study has been done at NASDAQ investigating the effects of tick size 
 \newline
 Nevertheless, in order to train the agents in the trading environments, we need to understand reinforcement learning. In \parencite{arulkumaran2017brief, mnih2015human, li2017deep} good overviews of the current state of the art deep reinforcement learning (RL) is presented.  Recently some of the state of the art research, has been driven by DeepMind and their work with the game Go. See for instances \parencite{silver2016mastering, silver2017mastering, vinyals2017starcraft}, that serves as inspiration of best practices. Competitive self-play is introduced and examined in \parencite{bansal2017emergent, schulman2017proximal}. Which is the main idea to be examined in this thesis. However applied to the Nordic financial market instead of games. In \parencite{busoniu2008comprehensive, bucsoniu2010multi} some of the most common multiagent reinforcement learning strategies are discussed. Where this thesis will use a multiagent approach too, when training several agents. That will interact and competent with each other. 
 
-\chapter{Methods}
+\chapter{Research Summary}
+
+\section{Research Question}
+The research question for this thesis is shown below:
+
+\begin{RQ}
+Will trading dynamics such as the bid-ask spread clustering, optimal trade execution and optimal inventory costs be exhibited \& learned by reinforcement learning agents using competitive self-play on a simulated Nordic stock market.
+\end{RQ}
+
+\section{Research Challenges}
+
+\section{Research Methodology}
+
+\subsection{Overview}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{Imgs/researchmethodsv2.PNG}
+    \caption{Overview of the different research methodology stages conducted during the thesis.}
+    \label{fig:r1}
+\end{figure}
+
+\subsection{Research Goals}
+
+\subsection{Research Methods}
+
+\subsection{Literature Study}
+
+\subsection{Implementation, Experiments \& Evaluation}
+
+\section{Validity}
+
+\subsection{Construct Validity}
+
+\subsection{Internal Validity}
+
+\subsection{Conclusion Validity}
+
+\chapter{Implementation \& Experiments}
 
 \section{Overview}
-
 %add flowchart here
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.7]{Imgs/implementation.png}
+    \caption{Overview of the implementation of the different agents and environments in the thesis.}
+    \label{fig:i1}
+\end{figure}
+In this chapter the implementation and experiments on the different agents and environments used are described. In \autoref{fig:i1} an overview is provided. Which will be addressed more thoroughly in the following sections.
 
 \section{Environments \& Data}
-Even-though if OpenAI gym provides a lot of great environments to start with. We had to build our own OpenAI environments used throughout the thesis. These are implemented following the papers presented in the background section from \textcite{ho1981optimal} and .. The environments that will be presented are \textit{DealerMarket-v0, DealerMarket-v1, ...}
-
-\subsection{DealerMarket-v0}
+Even-though if OpenAI gym provides a lot of great environments to start with. We had to build our own OpenAI environments used throughout the thesis. These are implemented following the papers presented in the background section from \textcite{ho1981optimal} and .. The environments that will be presented are \textit{DealerMarket-v1, DealerMarket-v2 and LOBMarket-v1}
 
 \subsection{DealerMarket-v1}
+In the first version of the DealerMarket we have built our own OpenAI environment in python. This environment is inspired by the ideas underpinning \textcite{ho1981optimal}. This environment is a single agent that's a dealer or market maker. The agent has four possible actions:
+\begin{enumerate}
+    \item Move bid up $(0)$
+    \item Move bid down $(1)$
+    \item Move ask up $(2)$
+    \item Move ask down $(3)$
+\end{enumerate}
+There are no hidden states in this environment, as we wanted to make it fairly easy for the agent. In order to use this as a benchmark to other environments and agents. The agent have the following observed state variables: \textit{volume imbalance, offset imbalance, inventory imbalance, spread, wealth} and \textit{share value}. Each called $[ibv, ibo, ibif,sp, w,v]$ hereafter. These are defined below:
+\begin{equation}
+\label{eq:m1}
+    ibv = (\text{last at bid - last at ask})/(\text{last at bid + last at ask})
+\end{equation}
 
+\begin{equation}
+\label{eq:m2}
+    ibo = (\text{off set ask + offset bid})/(\text{spread})
+\end{equation}
 
-\section{Software \& Hardware}
+\begin{equation}
+\label{eq:m3}
+    ibif = (\text{inventory - funds/ref price})/(\text{wealth})
+\end{equation}
 
-\subsection{OpenAI Gym \& Baselines}
+\begin{equation}
+\label{eq:m4}
+    sp = (\text{offset ask - offset bid})
+\end{equation}
+
+\begin{equation}
+\label{eq:m5}
+    w = (\text{funds/price ref + inventory})
+\end{equation}
+
+\begin{equation}
+\label{eq:m6}
+    v = \text{share value}
+\end{equation}
+The state variables in \autoref{eq:m1} to \autoref{eq:m6} are changing thought the training of the agent. Where the agents goal is to optimize its reward ($rwd$):
+
+\begin{equation}
+    \label{eq:m7}
+    Reward = \Delta \text{inventory} + \Delta funds
+\end{equation}
+hence optimizing the change of the agents reward without no mark-to-market at every time-step. The agent is given an initial amount of funds of $100000$ and initial inventory of $1000$ and the initial value of the simulated stock is $1000$. Each simulation was then ran for two million episodes. With three different random seeds as reinforcement learning is known to be fragile. The neural network used is shown below:
+\newline
+\newline
+The optimizer used was Adam with a learning rate, $\lambda =10^-{5}$. Memory of $100000$ units. MaxBoltzmann Policy with $\tau=0.25, \epsilon=0.1$. After training the agent we tested the agent with the pre-trained weights on the environment for 500 steps or simulations of 10 000 intervals. This in order to see if the agent had learned or not learned something. To calculate confidence intervals for the reward.
+\subsection{DealerMarket-v2}
+
+\subsection{LOBMarket-v1}
+
+\section{Experiments}
+
+\subsection{Competitive Self-Play}
+
+\subsection{Neural Network Models}
+The following Neural networks models where used in the different environments, which where found after both hyper-parameter search, and what have been used in previous literature. All the models used are shown on the next page in \autoref{tab:e1}. For \textit{DealerMarket-v1} we trained a 8-layer fully-connected neural network (FCNN) using the DQN agent and Boltzmann policy. With LeakyReLU as activation layer.
+
+\begin{table}[H]
+\centering
+\caption{The different network architectures used in the thesis. Type indicates what type of agent used and policy.}
+\label{tab:e1}
+\begin{tabular}{llll}
+ \textbf{Environment} & \textbf{Architecture}  & \textbf{Type}  & \textbf{Library}  \\ \hline
+ \textit{DealerMarket-V1}& 8-layer FCNN  & DQN + Boltzmann  & keras-RL   \\
+ \textit{DealerMarket-V2}& ?  & PPO +  & tensorforce  \\
+ \textit{DealerMarket-V2}& ?  & PPO + Self Play  & tensorforce  \\
+ \textit{DealerMarket-V2} & ?  & Random  & tensorforce \\
+ \textit{LOBMarket-V1} & ?  & PPO + Self-Play  & tensorforce \\ 
+ \textit{LOBMarket-V1} & ?  & Random +  & tensorforce \\ 
+ \textit{LOBMarket-V1} & ?  & Random +  & tensorforce
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Values of the different hyper-parameters used, that where chosen in the thesis. Learning rate ($\eta$), episodes (eps), memory (mem), policy parameters ($\tau, \varepsilon$)}
+\label{tab:e2}
+\begin{tabular}{llll}
+ \textbf{Environment} & \textbf{Type} & \textbf{Hyper-parameters} & \textbf{Values}  \\ \hline
+ \textit{DealerMarket-V1} & DQN  & [$\eta$, eps, mem, $\tau$] & [$1e^{-5}, 7\cdot10^6, 1\cdot10^5, 0.25$ ]  \\
+ \textit{DealerMarket-V2} &  & &   \\
+ \textit{DealerMarket-V2} &  & &  \\
+ \textit{LOBMarket-V1} &  & &  \\
+ \textit{LOBMarket-V1} &  & & 
+\end{tabular}
+\end{table}
+\subsection{Software \& Hardware}
+
+\subsubsection*{OpenAI Gym \& Baselines}
 OpenAI Baselines is a state-of-the-art library used for research and testing of different reinforcement learning algorithms created by \textcite{baselines}. From the library these work uses the following algorithms \textit{DQN, PPO2, HER} and ..
 
-\subsection{keras-RL}
+\subsubsection*{keras-RL}
+Keras-RL is a library for reinforcment learning. Whihc is developed by \textcite{plappert2016kerasrl} with some state-of-art reinforcement learning algorithms such as: \textit{Deep Q Learning, SARSA} and and Deep Deterministic Policy Gradient. All these implemented in python, with an easy to use interface of keras modular API for building neural networks. This library also works seamless with OpenAI. Which was why it was selected to be used as the primary library for this project. However throughout the project we realized that we needed to work with another more up-to-date library that was more frequently updated. Hence the choice fell on \textit{Tensorforce}.  
 
-\subsection{Tensorforce}
+\subsubsection*{Tensorforce}
+Tensorforce developed by \textcite{schaarschmidt2017tensorforce} is another python based reinforcement learning library. Built on top of Tensorflow with a modular API basing parameter using python dictionaries. Some implemented agents in the library that are of interest for this project is \textit{AC3, PPO, DQN} and both a \textit{random} and \textit{constant} agent for sanity checks \parencite{schaarschmidt2017tensorforce}.
 
-\subsection{AWS}
+\subsubsection*{Platform specification}
+The majority of these experiments and simulations where conducted on a virtual machine on AWS. 
+We used a p2.xlarge EC2 instances on AWS, with the following specifications: 1 Tesla K80 GPU, 4 vCPUs and 61 GiB RAM. For initial testing and debugging local experiments where also run on a Intel i5 dual-core CPU with 2,40 GHz and 8 GB RAM with a Windows 10 Pro operating system. 
 
-\section{Evaluation}
+%\newpage
 
-\section{Validation}
-
-\chapter{Results}
-
-\section{DealerMarket-v0}
+\section{Visualization}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=.4]{test_Exim_v3_2M.png}
-    \caption{Graphs for episode reward, loss function and mean absolute error. After training agent for two million steps.}
-    \label{fig:dm1}
+    \includegraphics[scale=.4]{Imgs/lob_untrained_Moment.jpg}
+    \caption{Example of visualization during training. Showing how an untrained agent posting bid and ask quotes in a LOB. Purple bricks are, blue are, yellow are ..}
+    \label{fig:v1}
 \end{figure}
+
+In order to understand what the agents are doing. Some visualization has been employed. Firstly during training using the pygame python library. This visualization shows what bid and ask quotes that the agent thinks are the best to quote. An example of the visualization is shown in \autoref{fig:v1}. 
+\newline
+\newline
+Secondly during training we save an info object containing bid and ask prices, volumes, inventory, value of the asset, cash and the difference in these. Which are later used for evaluation. However we do visualize these in order to understand how e.g. the bid-ask spread is evolving during training. These visualizations are all done in R reading the training history or callbacks saved in JSON files. Where both dplyr \parencite{dplyr} and ggplot2 \parencite{ggfplot2} are used for this purpose.
+
+\section{Evaluation}
+
+\chapter{Results}
+
+\section{DealerMarket-v1}
+
+\subsection*{Accumulated Reward}
+
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+	    	\centering
+		%The code to input the plot is extremely simple
+		\input{Imgs/hist_rwd_d1.tex}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Histogram over accumulated reward for DealerMarket-V0 agent. After testing trained model on environment for 500 simulations of 1000 steps each. Red vertical line is mean reward over all experiments. }
+		\label{fig:dm1}
+\end{figure}
+
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Fri May 18 00:04:06 2018
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+ \textbf{Model} & \textbf{MeanRwd} & \textbf{StdRwd} & \textbf{MaxRwd} & \textbf{MinRwd} & \textbf{CI} \\ 
+  \hline
+DealerMarket-V0 & 484.49 & 1.68 & 490.29 & 478.67 & 0.12 \\ 
+   \hline
+\end{tabular}
+\label{tab:dm1}
+\caption{Table over reward after in total $10^6$ steps}
+\end{table}
+
+\subsection*{Q-value function, episode reward \& loss}
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+	    	\centering
+		%The code to input the plot is extremely simple
+		\input{Imgs/hist_train_d1.tex}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Plots from training the DealerMarket-V0 agent. With best weights after training for $2\cdot 10^{6}$ time-steps. Plotted with 95 \% confidence interval}
+		\label{fig:dm11}
+\end{figure}
+In \autoref{fig:dm11} the complete history from training the market-maker agent is shown. We can see that the optimal Q-value (action-value function) stagnates quite quickly..
+
+\subsection*{Bid-Ask Spread, Inventory \& Stuff}
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+	    	\centering
+		%The code to input the plot is extremely simple
+		\input{Imgs/hist_train_spreads_v2.tex}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Plots showing how the bid-ask price and bid-ask spread has evolved during training of the agent. This also compared to the mid price. First plot is the different between the bid and ask price. Second plot is the spread i.e. the difference between tha ask and bid prices.}
+		\label{fig:dm12}
+\end{figure}
+In \autoref{fig:dm12} the bid-ask spread is presented. As can be seen from the figure ...
+
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+	    	\centering
+		%The code to input the plot is extremely simple
+		\input{Imgs/hist_train_inv_vols.tex}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{First plot showing how the market maker agents inventory is chaining compared the initial inventory which is stochastic. Second plot showing how the bid and ask volumes are evolving,  throughout all the simulations.}
+		\label{fig:dm13}
+\end{figure}
+
+In \autoref{fig:dm13} we see how the inventory and bid-ask volumes are chancing. This is interesting to look at as.. indicates something something
+
+\subsection*{Correlation between inventory and prices}
+
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+	    	\centering
+		%The code to input the plot is extremely simple
+		\input{Imgs/hist_train_price_inv.tex}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Plot over correlation between mid, bid and ask price against the inventory.}
+		\label{fig:dm14}
+\end{figure}
+
+\section{DealerMarket-v2}
+
+\subsection*{Accumulated Reward}
+
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+	    	\centering
+		%The code to input the plot is extremely simple
+		\input{Imgs/hist_rwd_d1.tex}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Histogram over accumulated reward for DealerMarket-V0 agent. After testing trained model on environment for 1000 simulations of 1000 steps each. Red vertical line is mean reward over all experiments. }
+		\label{fig:dm2}
+\end{figure}
+
+\section{LOBMarket-v1}
+
+\subsection*{Accumulated Reward}
+
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+	    	\centering
+		%The code to input the plot is extremely simple
+		\input{Imgs/hist_rwd_d1.tex}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Histogram over accumulated reward for DealerMarket-V0 agent. After testing trained model on environment for 1000 simulations of 1000 steps each. Red vertical line is mean reward over all experiments. }
+		\label{fig:dm3}
+\end{figure}
+
+
+
+
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[scale=.4]{test_Exim_v3_2M.png}
+%    \caption{Graphs for episode reward, loss function and mean absolute error. After training agent for two million steps.}
+%    \label{fig:dm1}
+%\end{figure}
 
 \chapter{Discussion \& Conclusions}
 
@@ -819,4 +1071,117 @@ In this chapter algorithms using dynamic programming for finding optimal value a
  \label{alg1}
 \end{algorithm}
 
+\chapter{Derivation of Ho \& Stoll Model}\label{app:B}
+In this chapter, some explanations to the derivation of the Ho \& Stoll model are presented. Using dynamic programming, stochastic calculus and the famous Ito's lemma.
+
+\section{Dynamic Programming}
+
+\section{Stochastic Calculus}
+
+\section{Ito's Lemma}
+
+\section{Optimal inventory for a Market Maker}
+In \textcite{ho1981optimal} a model that handles the risk the market maker faces when providing his service is presented. In the model the following assumptions are made:
+
+\begin{itemize}
+    \item Transactions follow a stationary continuous time stochastic jump process i.e. a Poisson process. 
+    
+    \item The arrival rate of buy orders ($\lambda_a$) and sell orders ($\lambda_b$) will depend on the dealer's ask and bid prices.
+    
+    \item The dealer face uncertainty over the future value of his portfolio $X$
+\end{itemize}
+In the the absence of any transactions the portfolio growth $dX$ is given below:
+
+\begin{equation}
+    \label{eq:a8}
+    dX = r_{x}Xdt + XdZ_x
+\end{equation}
+Where $r_x$ is the mean return, $dZ_x$ is the Wiener process with mean zero variance $\sigma^{2}_X$. The dealers wealth is divided into three components: \textit{cash, inventory} and \textit{base wealth}. The value of the cash account ($F$) is:
+
+\begin{equation}
+    \label{eq:a9}
+    dF = rFdt- (p-b)dq_b + (p+a)dq_a
+\end{equation}
+Which changes with buys and sells of securities earning the risk-free rate $r$. The dealers inventory ($I$) is given by:
+
+\begin{equation}
+    \label{eq:a10}
+    dI = r_{I}Idt+pdq_{b} - pdq_{a} + IdZ_{I}
+\end{equation}
+The inventory consists of shares in the stock tha market maker makes.
+Finally base wealth ($Y$) is given by:
+
+\begin{equation}
+    \label{eq:a11}
+    dY = r_{Y}Ydt+YdZ_{Y} 
+\end{equation}
+The objective of the dealer is now to maximize the expected utility of his total wealth $E[U(W_T)]$ at time horizon $T$, where 
+
+\begin{equation}
+    \label{eq:a12}
+    W_{T} = F_{T} + I_{T} + Y_{T}
+\end{equation}
+\autoref{eq:12} is what is termed \textit{the dealers pricing problem}. This is in fact an optimization problem where we want to maximize the value function $J(\cdot)$ using dynamic programming. We have thus the optimization below in \autoref{eq:a13a}
+
+\begin{equation}
+    \label{eq:a13a}
+    J(t,F,I,Y) = \underset{a,b}{\max}[E[U(W_T)] | t,F,I,Y]
+\end{equation}
+where $U$ is the utility function, $a$ and $b$ are the ask and bid adjustments and $t, F, I,Y$ are the states variables time, cash, inventory and base wealth \parencite{o1995market}. The function $J(\cdot)$ gives the level of utility given that the dealer's decisions are made optimally \parencite{o1995market}. As there are no intermediate consumption before time $T$ in this model. The recurrence relation found by using the principle of optimality is:
+
+\begin{equation}
+    \label{eq:a13bc}
+    \underset{a,b}{\max}dJ(t,F,I,Y)=0 \text{ and } 
+    J(T,F,I,Y)=U(W_T)
+\end{equation}
+Solving \autoref{eq:a13bc} finds a solution to the dealer's problem, where we have to find the ask and bid prices for each state. To solve \autoref{eq:a13bc} one requires to use stochastic calculus. By writing out the partial differential equations that \autoref{eq:a13bc} implies and apply Ito's Lemma:
+
+\begin{align*}
+    \label{eq:a13d}
+    \underset{a,b}{max}(dJ/dt) = & J_t + LJ \\
+    & + max\{\lambda_a[J(F+pQ+aQ, I-pQ,Y) - J(F,I,Y)] \\
+    & + \lambda_b [J(F-pQ+bQ, I+pQ,Y) - J(F,I,Y)] \} = 0 \numberthis
+\end{align*}
+where $J_t$ is the time derivative and $L$ is the operator defined as
+
+\begin{equation}
+    LJ = J_{F}rF + J_{I}r_{I}I+J_{Y}r_{y}Y+\frac{1}{2}J_{II}\sigma^{2}_{I}I^{2}+ \frac{1}{2}J_{YY}\sigma^{2}_{Y}Y^{2} + J_{IY}\sigma_{IY}IY
+\end{equation}
+$J_t + LJ$ is the total time derivative of derived utility when there are no transactions. \autoref{eq:a13d} determines the solution, but is hard to solve explicitly. \textcite{ho1981optimal} do not solve the general problem but introduces some transformations and simplifications in order to solve it. Firstly by looking at the problem only at the endpoint ($\tau$) where it is is equal to zero. Secondly by taken the first-order approximation of the Taylor series expansion of \autoref{eq:a13a} \parencite{o1995market}. \textcite{ho1981optimal} then, also define two new operators the sell ($S$) and buy ($B$) operators:
+\begin{align}
+    \label{eq:a13e}
+    SJ = & S[J(F,I,Y)] = J(F+Q,I-Q, Y) \\
+    BJ = & B[J(F,I,Y)] = J(F-Q, I+Q, Y)
+\end{align}
+
+By using the new operators the problem in \autoref{eq:a13d} can be rewritten as:
+
+\begin{align*}
+    \label{eq:a13e2}
+    J_{t} = & LJ + \underset{a,b}{max}\{[\lambda(a)aQSJ_{F} - \lambda(a)(J-SJ)] + \\
+    & [\lambda(b)bQBJ_{F} - \lambda(b)(J-BJ)]\} 
+    \numberthis
+\end{align*}
+where $\lambda(a) = \alpha - \beta_{A}$ and $\lambda(b) = \alpha + \beta_{B} $ is symmetric linear supply and demand functions to the dealer. There is no closed form solution for this problem but via approximations the bid and ask quotes can be found below:
+
+\begin{align}
+\label{eq:a13f}
+    b^{*} = & \alpha/2\beta + (J-BJ)/2BJ_{F}Q \\
+    a^{*} = & \alpha/2\beta + (J-SJ)/2SJ_{F}Q \label{eq:a13g}
+\end{align}
+Finally from \autoref{eq:13f} and \autoref{eq:13g} we get the bid-ask spread as
+\begin{equation}
+    \label{eq:a13h}
+    s = \alpha / \beta + (J-SJ)/2SJ_{F}Q + (J-BJ)/2BJ_{F}Q
+\end{equation}
+The first term of \autoref{eq:a13h} is the spread which maximizes the expected returns from selling and buying stocks. Whilst the rest of the terms are seen as \textit{risk premiums} for sale and purchase transactions. This as the dealer or market maker sets the spread without knowing what side the transaction will have i.e. bid or ask \parencite{ho1981optimal}.
+\newline
+\newline
+\textcite{ho1981optimal} demonstrates three important properties of the dealer's optimal pricing behavior:
+
+\begin{enumerate}
+    \item The spreads depends on the time horizon of the dealer
+    \item The spread can be decomposed into a risk neutral spread plus an adjustment for uncertainty
+    \item The spread is independent of inventory level.
+\end{enumerate}
 \end{document}
