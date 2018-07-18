@@ -1,3 +1,4 @@
+
 \documentclass{kththesis}
 
 \usepackage{blindtext} % This is just to get some nonsense text in this template, can be safely removed
@@ -13,16 +14,44 @@
 \usepackage{amsmath,float}
 \usepackage{amssymb}
 \usepackage{caption}
+%\usepackage{subcaption}
+\usepackage[lofdepth,lotdepth]{subfig}
 \captionsetup[figure]{labelfont=bf}
+\captionsetup[table]{labelfont=bf}
 \usepackage{amsthm}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 \newtheorem{hyp}{Hypothesis}
 \newtheorem{RQ}{Research Question}[section]
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newtheorem{RG}{Research Goal}[section]
+\newtheorem{RC}{Research Challenge}[section]
+
 
 \usepackage{graphicx}
 \usepackage[]{algorithm2e} %for algos
+\usepackage{listings}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=single,
+  language=python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 
 %for clickable hyperlinks
 %colors for different links
@@ -38,7 +67,7 @@
 
 \graphicspath{{Imgs/}}
 
-\title{Competitive self-playing reinforcement learning agents used in the Nordic stock market, to understand market microstructure}
+\title{Reinforcement learning agents used in the Nordic stock market, to understand market microstructure}
 
 \alttitle{Reinforcement learning agenter i den nordiska aktiemarknaden, för att förstå marknadens mikrostruktur }
 \author{Marcus Elwin}
@@ -74,12 +103,18 @@
 
 \tableofcontents
 
+\listoffigures
+ 
+\listoftables
+
+\lstlistoflistings
+
 
 % Mainmatter is where the actual contents of the thesis goes
 \mainmatter
 
 
-\chapter{Introduction}
+\chapter{Introduction}\label{ch:1}
 
 %We use the \emph{biblatex} package to handle our references.  We therefore use the
 %command \texttt{parencite} to get a reference in parenthesis, like this
@@ -88,7 +123,7 @@
 %the work of \textcite{einstein2016}.
 
 \section{Background}
-Modern financial markets such as NASDAQ, CME and NYSE have all been effected by the rise and presence of \textit{Algorithmic Trading} and \textit{High-Frequency Trading} (HFT).  Where both types of trading consists in using computer programs to implement investment and trading strategies \parencite{abergel2012market}. These types of strategies have according to \textcite{abergel2012market, o2015high} raised various questions about there effects on the financial markets. Mainly in areas as: \textit{liquidity, volatility, price discovery, systematic risk, manipulation} and \textit{market organization}. Where a quite recent example of the proposed effect of algorithmic trading and HFT on financial markets is \textit{the Flash Crash} in the 6th of May 2010. Where in the course of 30 minutes U.S. stock market indices, stock-index futures, options, and exchange-traded funds. Experienced a sudden price drop of more than five percent,followed by a rapid rebound \parencite{kirilenko2011flash,kirilenko2017flash}. See an illustration of this in \autoref{fig:1}.
+Modern financial markets such as NASDAQ, CME and NYSE have all been effected by the rise and presence of \textit{Algorithmic Trading} and \textit{High-Frequency Trading} (HFT).  Where both types of trading consists in using computer programs to implement investment and trading strategies \parencite{abergel2012market}. These types of strategies have according to \textcite{abergel2012market, o2015high} raised various questions about there effects on the financial markets. Mainly in areas as: \textit{liquidity, volatility, price discovery, systematic risk, manipulation} and \textit{market organization}. Where a quite recent example of the proposed effect of algorithmic trading and HFT on financial markets is \textit{the Flash Crash} the 6th of May 2010. Where in the course of 30 minutes U.S. stock market indices, stock-index futures, options, and exchange-traded funds. Experienced a sudden price drop of more than five percent, followed by a rapid rebound \parencite{kirilenko2011flash,kirilenko2017flash}. See an illustration of this in \autoref{fig:1}.
 \newline
 \newline
 Trading in the financial market can be seen as a search problem where buyers and sellers search for each-other. Which depends on market structure \parencite{abergel2012market}. \textit{Market microstructure} is a branch of economics, where one tries to understand trading dynamics on the financial market on a micro level \parencite{o1995market, hasbrouck2007empirical}. Market microstructure theory is used by regulators, traders and organizers of financial markets. In order to make a profit or create more transparent and efficient markets. Where a recent regulation with the purpose of making markets more transparent and efficient is \textit{Markets in Financial Instruments Directive} (MiFID) II \parencite{busch2016mifid}.
@@ -100,16 +135,16 @@ Trading in the financial market can be seen as a search problem where buyers and
     \label{fig:1}
 \end{figure}
 
-However as mentioned by \textcite{o2015high} due to HFT and algoritmic trading. Learning models and empirical models used in market microstructure in the past are deficient and may not longer be appropriate. Which calls for the use of new more capable methods. Where \textit{Reinforcement Learning} and other machine learning methods are of great interest. Machine learning and AI has been used in a financial setting for some time, and has become ubiquitous in finance today. Mainly due to the abundance of available data and computing power. 
+However as mentioned by \textcite{o2015high} due to HFT and algorithmic trading. Learning models and empirical models used in market microstructure in the past are deficient and may not longer be appropriate. Which calls for the use of new more capable methods. Where \textit{Reinforcement Learning} and other machine learning methods are of great interest. Machine learning and AI has been used in a financial setting for some time, and has become ubiquitous in finance today. Mainly due to the abundance of available data and computing power. 
 \newline
 \newline
-Where recent achievements for the use of Reinforcement Learning has been seen in the game Go with \textit{AlphaGo, AlphaGoZero} \parencite{silver2016mastering} programs being able to win over esteemed Go champions. More complicated strategic games as Star Craft has also seen successful application of reinforcement learning \parencite{vinyals2017starcraft}. Therefore the focus of this thesis will be to examine the possibility of using deep reinforcement learning and competitive self-play. In order to understand the market microstructure on a simulated Nordic stock market.
+Where recent achievements for the use of Reinforcement Learning has been seen in the game Go with \textit{AlphaGo, AlphaGoZero} \parencite{silver2016mastering} programs being able to win over esteemed Go champions. More complicated strategic games as Star Craft has also seen successful application of reinforcement learning \parencite{vinyals2017starcraft}. Therefore the focus of this thesis will be to examine the possibility of using deep reinforcement learning. In order understand the market microstructure off a simulated Nordic stock market.
 
 %need to work with
 %\section{Research Question}
 
 \section{Problem}
-With more granular and high frequency data as well as more sophisticated trading algorithms. The financial markets has become harder to understand during the past decade. Traditional methods used in market microstructure might have become obsolete as mentioned in \textcite{o2015high}. A traditional supervised learning approach is not of use for this thesis. Due to the fact of the financial markets dynamic nature as a complex system. The agents must be able to adapt and dynamically learn optimal behaviour.  Therefore the problem in this thesis is to understand by using reinforcement learning, specially learning via competitive self-play. On a simulated Nordic stock market. 
+With more granular and high frequency data as well as more sophisticated trading algorithms. The financial markets has become harder to understand during the past decade. Traditional methods used in market microstructure might have become obsolete as mentioned in \textcite{o2015high}. A traditional supervised learning approach is not of use for this thesis. Due to the fact of the financial markets dynamic nature as a complex system. The agents must be able to adapt and dynamically learn optimal behaviour.  Therefore the problem in this thesis is to understand trading dynamics. By using reinforcement learning, on a simulated Nordic stock market. 
 \newline
 \newline
 If common market microstructure trading dynamics such as \textit{bid-ask spread clustering, optimal trade execution} and \textit{optimal inventory costs} as described in \textcite{o1995market}. Will be exhibited and understood by the reinforcement learning agents. Also it is of interest to see what happens with the agents when changing the market conditions. Much like what is happening in the real markets. For example changing the number of participants, order sizes, prices and trading rules.
@@ -122,22 +157,43 @@ If common market microstructure trading dynamics such as \textit{bid-ask spread 
 The objective for this thesis is two-fold. Firstly in the case of the principal the objective is to have a functional and working exchange simulator (EXSIM). Where they can change different parameters, policies, reward functions and other things effecting the market. In order to study and simulate modern financial markets on a microscopic level. Secondly from the thesis point of view, the objective is to investigate the following:
 
 \begin{itemize}
-    \item Can competitive self-play and reinforcement learning be successfully used in a financial setting. 
+    \item Can reinforcement learning be successfully used in a financial setting. 
     \item Can new insight and applications be provided to the the growing field of market microstructure. 
     \item Can reinforcement learning work in more complicated environments such as the financial market.
 \end{itemize}
 
 
 \section{Delimitation}
+This thesis doesn't use any real world data for the simulations and experiments conducted. Instead only simulated data from the agents interaction with its environment is used. This due to security constraints at the principle. Information based market microstructure models has not been used in this thesis. Instead inventory based models and limit order book models have been used. Mainly due to time constraints. Exploration of distributed and parallel training of agents in order to speed up training. Using workers and a parameter server has not been performed. This also due to time constraints.
 
-\section{The principle}
+\section{Methodology}
+The methodology in the thesis has been empirical with a quantitative approach. Collecting data from the agents interactions with the environments. Through various experiments, to test different scenarios, behaviours and collect different statistics. More information about the methodology is found in \autoref{ch:5}.
 
+%\section{The principle}
+
+\section{Contribution}
+The contribution of this thesis is to show the usages of reinforcement learning to more complex environments as the financial markets. With a more realistic limit order book market compared to previous studies. In order to provide new insights and methods in the field of market microstructure. The target audience is both academia and the industry, that can benefit from this work.
+
+\newpage
 \section{Disposition}
+The thesis has the following structure:
 
+\begin{itemize}
+    \item In \autoref{ch:2}, the theoretical background needed for the thesis is presented. Covering \textit{market microstructure, artificial financial markets, algorithmic trading} and \textit{reinforcement learning}.
+    
+    \item In \autoref{ch:3}, related work relevant to the thesis is presented. This chapter presents the state-of-the art as well what differs this research from previous research.
+    
+    \item In \autoref{ch:4}, an overview of the research methodology employed for this thesis is presented.
+    
+    \item In \autoref{ch:5}, the implementation of the agents, environments, data collection and the experiments are presented in detail.
+    
+    \item In \autoref{ch:6}, the results obtained from the different experiments are presented and discussed.
+    
+    \item In \autoref{ch:7}, the main findings are highlighted and evaluated and compared to previous research. The conclusions of the thesis and future research is also presented.
+\end{itemize}
 %The student displays knowledge of theoretical background and previous related work (significant literature is mentioned and relevant material is used).
 
-The background is coherent and relevant.
-\chapter{Background}
+\chapter{Background}\label{ch:2}
 In this chapter relevant theory is presented in order to give the reader a good overview of the fields studied during the pre-study that are relevant for the thesis. Where we cover \textit{market microstructure theory, artificial financial markets, algorithmic and high frequency trading} and finally end with a section on \textit{reinforcement learning}.
 
 %Necessary
@@ -151,7 +207,7 @@ In this chapter relevant theory is presented in order to give the reader a good 
 
 % Real market with matching engine e.g. parity
 \section{Market Microstructure}
-\textit{Market microstructure} is the study of the process and outcomes of exchanging assets under implicit trading rules as mentioned in \textcite{o1995market}. A lot of market microstructure research according to \textcite{madhavan2000market} are concerned with : 
+\textit{Market microstructure} is the study of the process and outcomes of exchanging assets under implicit trading rules as mentioned in \textcite{o1995market}. The majority of market microstructure research is according to \textcite{madhavan2000market} concerned with : 
 \begin{enumerate}
     \item \textit{Price formation and discovery} i.e. looking in to the black box of the market by which latent demands are translated into prices.
     \item \textit{Market structure and design} i.e. what different rules effect the black box of the market.
@@ -168,14 +224,14 @@ Looking at today's financial markets
 \begin{itemize}
     \item \textbf{Fundamental traders:} those who are driven by economic fundamentals outside the exchange.
     \item \textbf{Informed traders:} traders who profit from leveraging information not reflected in market prices and trading assets in the hope of their increase or decrease in value.
-    \item \textbf{Market Makers:} professional trader who profit from facilitating exchange in a particular asset and exploit their skills in executing trades.
+    \item \textbf{Market Makers:} professional traders who profit from facilitating exchange in a particular asset and exploit their skills in executing trades.
 \end{itemize}
 
 \subsection{Trading Mechanisms}
-Any trading mechanism can be seen as a type of trading game in which players meet virtually or physical at some venue and act according to some rules \parencite{o1995market}. Where the players are some of the participants mentioned in the previous section. The venue or the market is trades are actually happening which can be on an exchange or via other intermediaries. A common division of market structure is presented in \textcite{foucault2013market} \textit{the limit order market} (auction market) and \textit{the dealer market}. In fact all trading mechanisms can be viewed as a variation of these \parencite{foucault2013market}.
+Any trading mechanism can be seen as a type of trading game in which players meet virtually or physical at some venue and act according to some rules \parencite{o1995market}. Where the players are some of the participants mentioned in the previous section. The venue or the market,  is where trades are actually executed. Which can be on an exchange or via other intermediaries. A common division of market structure is presented in \textcite{foucault2013market}. Where they classify markets as either \textit{limit order markets} (auction markets) or \textit{dealer markets}. In fact all trading mechanisms can be viewed as variations of these \parencite{foucault2013market}.
 \newline
 \newline
-In limited order markets, the final investors interact directly; there bids and offers are accumulated in the \textit{limited order book} (LOB). By price priority and secondly time priority \parencite{hasbrouck2007empirical}. Whilst in dealer markets participants can only trade at the bid and ask quotes posted by specialized intermediaries i.e. \textit{dealers} or \textit{market makers} \parencite{foucault2013market}. Note that the LOB is very dynamic as it constitutes of \textit{limit orders}\footnote{A limit order is an order that specifies a direction, quantity and acceptable price.}. Which can be cancelled or modified at any time, thus the LOB can change be changed extremely rapid \parencite{hasbrouck2007empirical}. 
+In limit order markets, the final investors interact directly; there bids and offers are accumulated in the \textit{limit order book} (LOB). The orders in the LOB are accumulated by firstly price priority and secondly time priority \parencite{hasbrouck2007empirical}. Whilst in dealer markets participants can only trade at the bid and ask quotes posted by specialized intermediaries i.e. \textit{dealers} or \textit{market makers} \parencite{foucault2013market}. Note that the LOB is very dynamic as it constitutes of \textit{limit orders}\footnote{A limit order is an order that specifies a direction, quantity and acceptable price.}. Which can be cancelled or modified at any time. Thus the state of the LOB can be changed extremely often \parencite{hasbrouck2007empirical}. For this thesis this means the agents will have a very large state space. Of possible actions, that they need to explore. In order to find optimal policies.
 
 \begin{figure}[H]
     \centering
@@ -188,17 +244,17 @@ More formally according to \textcite{bouchaud2018trades} we can see an order as 
 \begin{equation}
     \label{eq:0}
     x = (\varepsilon_{x}, p_{x}, v_{x}, t_{x})
-\end{equation} Where $\varepsilon = \pm 1$ indicates if it is a buy or sell order and $v_{x} > 0$.. An example of a limit order book is shown above in \autoref{fig:2}. Market orders are other types of orders found on LOB markets, which are usually considered to be more aggressive. This as they seek to execute a trade immediately \parencite{cartea2015algorithmic}. For instance if a market order is placed and the quantity is larger then quantity available in the book. The order is \textit{re-routed} or sad to 'walk the book' until the order is filled \parencite{hasbrouck2007empirical,cartea2015algorithmic}.
+\end{equation} Where $\varepsilon = \pm 1$ indicates if it is a buy or sell order and $v_{x} > 0$.. An example of a limit order book is shown above in \autoref{fig:2}. Market orders are other types of orders found on LOB markets, which are usually considered to be more aggressive. This as they seek to execute a trade immediately \parencite{cartea2015algorithmic}. For instance if a market order is placed and the quantity is larger then the quantity available in the book. The order is \textit{re-routed} or sad to 'walk the book' until the order is filled \parencite{hasbrouck2007empirical,cartea2015algorithmic}.
 \newline
 \newline
-When submitting an order $x$, the trader must chose the size $v_x$ and price $p_{x}$ according to a relevant \textit{lot size} and \textit{tick size} of the LOB \parencite{bouchaud2018trades}. The lot size $v_0$ is the smallest amount of the asset that can be trades. Hence the size of each order is a multiple of the lot size $v_{x} \in \{kv_{0} | k = 1,2,...\}$. The tick size $\vartheta$ is the smallest permissible price interval between different order within a given LOB \parencite{bouchaud2018trades}. The values of $v_{0}$ and $\vartheta$ differs a lot between exchanges. However expensive stocks are often traded with $v_0 = 1$ whilst cheaper stocks are traded with $v_{0} \gg 1$. In equity markets $\vartheta$ is often 0.01\% of the stocks's mid-price \parencite{bouchaud2018trades}. 
+When submitting an order $x$, the trader must chose the size $v_x$ and price $p_{x}$ according to a relevant \textit{lot size} and \textit{tick size} of the LOB \parencite{bouchaud2018trades}. The lot size $v_0$ is the smallest amount of the asset that can be trades. Hence the size of each order is a multiple of the lot size $v_{x} \in \{kv_{0} | k = 1,2,...\}$. The tick size $\vartheta$ is the smallest permissible price interval between different orders within a given LOB \parencite{bouchaud2018trades}. The values of $v_{0}$ and $\vartheta$ differs a lot between exchanges. However expensive stocks are often traded with $v_0 = 1$ whilst cheaper stocks are traded with $v_{0} \gg 1$. In equity markets $\vartheta$ is often 0.01\% of the stock's mid-price \parencite{bouchaud2018trades}. 
 \newline
 \newline
-Both the tick size and lot size affect trading. As the lot size dictates the smallest permissible order size. Whilst the tick size $\vartheta$ dictates how much more expensive it is for a trader to gain the priority. Of choosing a higher or lower price to a buy or sell order \parencite{bouchaud2018trades}. Sometimes it is also useful to consider the \textit{relative tick size} $\vartheta_r$, which is equal to the $\vartheta$ divided by the mid-price for a given asset \parencite{bouchaud2018trades}. To make things more complicated modern markets has a lot of different order types. Such as \textit{hidden, reserved, iceburg} and \textit{Fill-or-Kill} orders just to mention a few. Where \parencite{foucault2013market, cartea2015algorithmic, hasbrouck2007empirical} gives a good overview of these. There also exist \textit{hybrid markets} which are traditional quote-driven markets as Nasdaq and London Stock Exchange (LSE) \parencite{foucault2013market}.
+Both the tick size and lot size affect trading. As the lot size dictates the smallest permissible order size. Whilst the tick size $\vartheta$ dictates how much more expensive it is for a trader to gain the priority. Of choosing a higher or lower price to a buy or sell order \parencite{bouchaud2018trades}. Sometimes it is also useful to consider the \textit{relative tick size} $\vartheta_r$, which is equal to the $\vartheta$ divided by the mid-price for a given asset \parencite{bouchaud2018trades}. To make things more complicated modern markets has a lot of different order types. Such as \textit{hidden, reserved, ice-burg} and \textit{Fill-or-Kill} orders just to mention a few. Where \parencite{foucault2013market, cartea2015algorithmic, hasbrouck2007empirical} gives a good overview of these. There also exist \textit{hybrid markets} which are traditional quote-driven markets as NASDAQ and London Stock Exchange (LSE) \parencite{foucault2013market}.
 
 \subsection{Price Formation \& Discovery}
 
-The mechanism of price formation is at the very heart of economics.  Which is also important to understand 'stylized facts' in financial price series as \textit{heavy tails} and \textit{volatility clustering}  \parencite{abergel2012market}. \text{Price discovery} is the speed and accuracy with which transactions prices incorporate information available to market participants \parencite{foucault2013market}. In fact market makers, professional traders who stand willing to buy or sell securities. Is a logical starting point for how prices are actually determined in the market \parencite{madhavan2000market}. Another key is also the role of information and who has it, that will be covered more in section .. \parencite{cartea2015algorithmic}.
+The mechanism of price formation is at the very heart of economics.  Which is also important to understand 'stylized facts' in financial price series as \textit{heavy tails} and \textit{volatility clustering}  \parencite{abergel2012market}. \text{Price discovery} is the speed and accuracy with which transactions prices incorporate information available to market participants \parencite{foucault2013market}. In fact market makers, professional traders who stand willing to buy or sell securities. Is a logical starting point for how prices are actually determined in the market \parencite{madhavan2000market}. Another key is also the role of information and who has it \parencite{cartea2015algorithmic}.
 
 
 \begin{figure}[H]
@@ -214,7 +270,7 @@ The mechanism of price formation is at the very heart of economics.  Which is al
 The bid-ask spread is usually decomposed into three components: \textit{adverse selection, order-processing costs} and \textit{inventory holding costs} \parencite{foucault2013market}. Order processing costs, consists of the setup price and operating costs of trading. Inventory costs is cost associated with carrying inventory. Adverse selection costs are costs that arise because some traders are more informed then others. When trading with these \textit{informed traders}, market makers will on average lose money \parencite{darley2007nasdaq}. Therefore a fraction of the bid-ask spread can be seen as a compensation for having to trade against informed traders \parencite{darley2007nasdaq}.In \autoref{fig:3} above these are illustrated on a short-term and long-term perspective.
 \newline
 \newline
-Market makers quote two prices the bid price and the ask price where the difference between these is the market makers \textit{spread} \parencite{madhavan2000market}. By doing this market makers are also providing \textit{liquidity} to the market. Spreads measure the execution cost of small transaction, by measuring how close the price of a trade is to the \textit{market price}. Where the market price is the \textit{equilibrium price} i.e. the price where demand equals supply \parencite{cartea2015algorithmic}. One approach is by using the \textit{midprice} in \autoref{eq:1}:
+Market makers quote two prices the bid price and the ask price where the difference between these is the market makers \textit{spread} \parencite{madhavan2000market}. By doing this market makers are also providing \textit{liquidity} to the market. Spreads measure the execution cost of a small transaction, by measuring how close the price of a trade is to the \textit{market price}. Where the market price is the \textit{equilibrium price} i.e. the price where demand equals supply \parencite{cartea2015algorithmic}. One approach is by using the \textit{midprice} in \autoref{eq:1}:
 
 \begin{equation}
     \label{eq:1}
@@ -247,12 +303,12 @@ Where $\bar{a}(q)$ and $\bar{b}(q)$ is the average execution price for buy and s
 \begin{itemize}
     \item The trade prices series is a martingale \& the order flow is not symmetric
     \item The spread declines over time \& the bid-ask spread are lower in high volume securities and wider for more riskier securities.
-    \item For large-tick stock, the spread is almost equal to on tick. Small-tick stocks have a broader distribution of spreads.
+    \item For large-tick stock, the spread is almost equal to one tick. Small-tick stocks have a broader distribution of spreads.
     \item There is a price impact of trades i.e. on average the arrival of a buy trade causes prices to rise ($S_t$ increases). Whilst the arrival of sell trades causes prices to fall ($S_t$ decreases).
 \end{itemize}
 
 \subsubsection*{Liquidity}
-If the structure of a securities market is compared to a car design, measuring liquidity is like assessing the car's driving performance \parencite{foucault2013market}.Liquidity impounds the usual economic concept of \textit{elasticity}. In a liquid market, a small shift in supply and demand doesn't result in large price changes \parencite{hasbrouck2007empirical}. However liquidity is also concerned with trading costs. Market makers are seen as liquidity providers (sell-side) whilst liquidity demanders are the customers (buy-side) \parencite{hasbrouck2007empirical}. A key dimension of liquidity is \textit{immediacy}. This is the ability of a investor to buy or sell an asset without having to wait to find a counterpart. With an offsetting position to sell or buy \parencite{cartea2015algorithmic}. In fact the bid-ask spread is a common measure of how liquid a market is \parencite{foucault2013market}.
+If the structure of a securities market is compared to a car design, measuring liquidity is like assessing the car's driving performance \parencite{foucault2013market}. Liquidity impounds the usual economic concept of \textit{elasticity}. In a liquid market, a small shift in supply and demand doesn't result in large price changes \parencite{hasbrouck2007empirical}. However liquidity is also concerned with trading costs. Market makers are seen as liquidity providers (sell-side) whilst liquidity demanders are the customers (buy-side) \parencite{hasbrouck2007empirical}. A key dimension of liquidity is \textit{immediacy}. This is the ability of a investor to buy or sell an asset without having to wait to find a counterpart. With an offsetting position to sell or buy \parencite{cartea2015algorithmic}. In fact the bid-ask spread is a common measure of how liquid a market is \parencite{foucault2013market}.
 
 \subsubsection*{Other measures of implicit trading costs}
 A popular benchmark in trading costs analysis is the \textit{volume-weighed average price} (VWAP). For all transaction in the stock during a interval ($T$), often a trading day \parencite{foucault2013market}:
@@ -267,19 +323,19 @@ Where $w_t = \frac{|q_t|}{\sum_{t\in T}{|q_t|}}$ and $p_t$ and $q_t$ is the pric
     \label{eq:6}
     \Delta S_n = \lambda q_n + \varepsilon_n
 \end{equation}
-Where $\Delta S_n = S_{n\tau}-S_{(n-1)\tau}$ for a time interval $[(n-1)\tau, n\tau]$ \parencite{cartea2015algorithmic}. Using \autoref{eq:6} we can then estimate $\lambda$. Where the parameter $\lambda$ also called \textit{Kyle's lambda} \parencite{bouchaud2018trades} is capturing the market's price reaction i.e. its price impact. On the other hand $q_n$ is the order imbalance or net order flow \footnote{difference between of buy and sell orders during an interval} and  $\varepsilon_n$ the error term assumed to be normally distributed \parencite{cartea2015algorithmic, foucault2013market}. In terms of measuring liquidity a lower $\lambda$ indicates that the market is more liquid. Due to greater competition, lower risk tolerance or lower volatility \parencite{cartea2015algorithmic}. Thus meaning that a lower $\lambda$ means that prices are less sensitive to order imbalance \parencite{foucault2013market}.  A larger $\lambda$ indicates that the given volume impacts the prices, and trading is thus more expensive \parencite{bouchaud2018trades}.
+Where $\Delta S_n = S_{n\tau}-S_{(n-1)\tau}$ for a time interval $[(n-1)\tau, n\tau]$ \parencite{cartea2015algorithmic}. Using \autoref{eq:6} we can then estimate $\lambda$. Where the parameter $\lambda$, also called \textit{Kyle's lambda} \parencite{bouchaud2018trades} is capturing the market's price reaction i.e. its price impact. On the other hand $q_n$ is the order imbalance or net order flow \footnote{difference between buy and sell orders during an interval} and  $\varepsilon_n$ the error term assumed to be normally distributed \parencite{cartea2015algorithmic, foucault2013market}. In terms of measuring liquidity a lower $\lambda$ indicates that the market is more liquid. Due to greater competition, lower risk tolerance or lower volatility \parencite{cartea2015algorithmic}. Thus meaning that a lower $\lambda$ means that prices are less sensitive to order imbalance \parencite{foucault2013market}.  A larger $\lambda$ indicates that the given volume impacts the prices, and trading is thus more expensive \parencite{bouchaud2018trades}.
 
 \subsection{Inventory-based models}
-A large (positive) inventory causes the dealer or market maker to face a higher cost for observing more inventory. Which lowers both bid and ask prices by the same amount \parencite{o1995market}. Vice versa holds for negative inventory. 
+A large (positive) inventory causes the dealer or market maker to face a higher cost for observing more inventory. Which lowers both bid and ask prices by the same amount \parencite{o1995market}. Vice versa holds for negative inventory. The model by \textcite{ho1981optimal} is one of the most popular inventory-based models, presented below.
 
 \subsubsection*{Ho \& Stoll Model}
-In \textcite{ho1981optimal} a model that handles the risk the market maker faces when providing his service is presented. In the model the following assumptions are made: \textit{transactions follow a Poisson process, the dealer faces uncertainty over the future and, the arrival rate of orders depend on the bid and ask prices}. In the the absence of any transactions the portfolio growth $dX$ is given below:
+In \textcite{ho1981optimal}, they present a model that handles the risk the market maker faces when providing his service. In the model the following assumptions are made: \textit{transactions follow a Poisson process, the dealer faces uncertainty over the future and, the arrival rate of orders depend on the bid and ask prices}. In the the absence of any transactions the portfolio growth $dX$ is given below:
 
 \begin{equation}
     \label{eq:8}
     dX = r_{x}Xdt + XdZ_x
 \end{equation}
-Where $r_x$ is the mean return, $dZ_x$ is the Wiener process with mean zero variance $\sigma^{2}_X$. The dealers wealth is divided into three components: \textit{cash, inventory} and \textit{base wealth}. The value of the cash account ($F$) is:
+Where $r_x$ is the mean return, $dZ_x$ is the Wiener process with mean zero and variance $\sigma^{2}_X$. The dealers wealth is divided into three components: \textit{cash, inventory} and \textit{base wealth}. The value of the cash account ($F$) is:
 
 \begin{equation}
     \label{eq:9}
@@ -304,7 +360,7 @@ The objective of the dealer is now to maximize the expected utility of his total
     \label{eq:12}
     W_{T} = F_{T} + I_{T} + Y_{T}
 \end{equation}
-\autoref{eq:12} is what is termed \textit{the dealers pricing problem}. This is in fact an optimization problem where we want to maximize the value function $J(\cdot)$ using dynamic programming. We have thus the optimization below in \autoref{eq:13a}
+\autoref{eq:12} is what is termed \textit{the dealers pricing problem}. This is in fact an optimization problem where we want to maximize the value function $J(\cdot)$ using dynamic programming. We thus have the optimization problem below in \autoref{eq:13a}
 
 \begin{equation}
     \label{eq:13a}
@@ -343,13 +399,14 @@ The first term of \autoref{eq:13h} is the spread which maximizes the expected re
 \textcite{ho1981optimal} demonstrates three important properties of the dealer's optimal pricing behavior: \textit{the spreads depends on the time horizon of the dealer, it can be decomposed in a risk-neutral and risk part, and the spread is independent of inventory level.}
 
 \subsection{Information-based models}
+Information-based models allow for examination of market dynamics. Hence providing insights into the adjustment process of prices \parencite{o1995market}. Where a popular model is the one by \textcite{glosten1985bid}.
 
 \subsubsection*{Glosten-Milgrom Model}
 In the Glosten-Milgrom one tries to capture the features of how adverse selection affects the bid ask spread \parencite{darley2007nasdaq}. One assumes the following in the model:
 \begin{itemize}
     \item A market with trading in a single asset
     \item All market participants are risk-neutral and act competitively
-    \item The market is \textit{frictionless} i.e. there are no transaction costs, taxes or holding costs.
+    \item The market is \textit{friction-less} i.e. there are no transaction costs, taxes or holding costs.
     \item The value of the asset is a random variable whose probability law is know to the market makers.
 \end{itemize}
 Informed traders have information about the realization of a assets \textit{true value}, $V$. The distribution of $V$ is assumed to be binomial. With the probability $\theta$ and $1- \theta$ if the value of the asset is higher or lower $\overline{V}, \underline{V}$  then the true value \parencite{darley2007nasdaq}. Uniformed traders only have information about the triple $(\theta, \underline{V}, \overline{V})$ and we have two fraction of these. The ones that wants to buy $\gamma^{B}$, and the ones that want to sell $\gamma^{S}$ \parencite{darley2007nasdaq}. The fraction of informed traders is instead denoted $\mu$. The market maker sets bid ($E[V|\text{Sell}]$) and ask prices ($E[V|\text{Buy}]$) by conditional expectations of the true value given a sell or buy order. By definition \parencite{darley2007nasdaq} 
@@ -375,10 +432,10 @@ In agent-based modelling (ABM), appropriate parts of the complex system are mode
     \item \textit{Heterogeneity} i.e. types of agents, parameters, information basis and learning.
     \item \textit{Learning} i.e. zero intelligence or more complex.
 \end{itemize}
-Validation is an important issue in agent-based modelling, where simulated markets should be able to replicate realistic quantitative features of the real market, with reasonable calibration \parencite{martinez2009evolutionary}. In order to validate multiple parameters need to be user defined. However to overcome this, using a benchmark in which the behaviour of the market is well defined is on way. Another way according to \textcite{martinez2009evolutionary} is to use parameters in the simulated market derived from experimental or real markets. 
+Validation is an important issue in agent-based modelling, where simulated markets should be able to replicate realistic quantitative features of the real market, with reasonable calibration \parencite{martinez2009evolutionary}. In order to validate, multiple parameters need to be user-defined. However one way to overcome this. Is by using a benchmark in which the behaviour of the market is well defined. Another way according to \textcite{martinez2009evolutionary} is to use parameters in the simulated market derived from experimental or real markets. 
 \newline
 \newline
-It is also common to test whether the prices created via the interaction of the agents exhibit certain \textit{stylized facts}. That real world markets do \parencite{brandouy2011design}. With stylized facts we mean a set of properties that is common across many instruments, markets and times. That has been observed by independent studies \parencite{cont2001empirical}. Where some of the know stylized facts important for this study are:
+It is also common to test whether the prices created via the interaction of the agents exhibit certain \textit{stylized facts}. That real world markets do \parencite{brandouy2011design}. With stylized facts we mean a set of properties that is common across many instruments, markets and times. That has been observed by independent studies \parencite{cont2001empirical}. Where some known stylized facts, important for this study are:
 
 \begin{itemize}
     \item \textit{Absence of autocorrelations} i.e. linear autocorrelations are often insignificant. 
@@ -392,12 +449,12 @@ For more information see for instance \textcite{cont2001empirical}.
 Algorithmic trading consists in using computer programs to implement investment and trading strategies \parencite{abergel2012market}. Conversely, High frequency trading (HFT)is a term used to describe a large diverse set of activities and behaviors \parencite{o2015high}. Where some of the main characteristics for high frequency traders are: (i) use of \textit{high-speed} and sophisticated programs for \textit{generating, executing} and \textit{routing} orders, (ii) use of \textit{co-location} to minimize \textit{latency}, (iii) very short time frames for their positions, (iv) submission of numerous orders that are cancelled shortly and (v) ending the day with almost flat positions. 
 \newline
 \newline
-A distinction can be made between algorithmic trading and HFT in their order frequency. Where HFT can enter more than thousands of orders per second, while algorithmic trading enters a few orders per minute \parencite{abergel2012market}.
+A distinction can be made between algorithmic trading and HFT in their order frequency. Where HFT can enter more than thousands of orders per second, while algorithmic trading only enters a few orders per minute \parencite{abergel2012market}.
 
 \subsection{Different types of strategies}
 
 \subsubsection*{Optimal Executions}
-A classic problem in finance is how an agent can sell or buy a large amount of shares, but yet minimize the adverse price movements. Which is a consequence of trading a too large trade \parencite{cartea2015algorithmic}. So what traders often do is that they divided the larger \textit{parent} order into smaller \textit{child} orders over time, using a broker. Hence the agent must formulate a model to decide how to find the optimal cost of executing the trade(s). Where executions costs calculated as the difference between a benchmark price and the actual prices\footnote{average price per share} \parencite{cartea2015algorithmic}. Often the midprice is used as a benchmark. Where a strategy using this is \textit{implementation shortfall} \parencite{cartea2015algorithmic}. There also exists other approaches based on time weighed average prices (TWAP).
+A classic problem in finance is how an agent can sell or buy a large amount of shares, but yet minimize the adverse price movements. Which is a consequence of trading a too large trade \parencite{cartea2015algorithmic}. So what traders often do is that they divided the larger \textit{parent} order into smaller \textit{child} orders over time, using a broker. Hence the agent must formulate a model to decide how to find the optimal cost of executing the trade(s). Where executions costs  are calculated as the difference between a benchmark price and the actual prices\footnote{average price per share} \parencite{cartea2015algorithmic}. Often the midprice is used as a benchmark. Where a strategy using this is \textit{implementation shortfall} \parencite{cartea2015algorithmic}. There also exists other approaches based on time weighed average prices (TWAP).
 
 \subsubsection*{Targeting volume}
 Trading algorithms that target benchmarks based on volume are extensively used. Where one of the most popular benchmarks is the Volume Weighted Average Price (VWAP) \parencite{cartea2015algorithmic}. Which is calculated as:
@@ -417,15 +474,16 @@ where $V_t$ is the total volume executed up to time $t$. $S_t$ is the midprice, 
 Large cancellation rates of orders in the orderbook. From for instance algorithmic traders may be indicative of low liquidity. This as participants publish quotes without the intent of getting them filled in the orderbook \parencite{de2018advances}. \textcite{de2018advances} mentioned four different categories for such \textit{predatory behaviour}:
 
 \begin{enumerate}
-    \item \textit{Qoute stuffers:} whom engage in ''latency arbitrage''. By overwhelming an exchange with messages with the sole purpose of slowing down competing algorithms.
-    \item \textit{Qoute danglers:} this strategy force a squeezed trader to chase a price against here interests. 
-    \item \textit{Liquidity squeezers:} when a large investor is forced to unwind here position. Algorithms trade in the same direction i.e. draining as much liquidity as possible. 
+    \item \textit{Quote stuffers:} whom engage in ''latency arbitrage''. By overwhelming an exchange with messages with the sole purpose of slowing down competing algorithms.
+    \item \textit{Quote danglers:} this strategy force a squeezed trader to chase a price against her interests. 
+    
+    \item \textit{Liquidity squeezers:} when a large investor is forced to unwind her position. Algorithms trade in the same direction i.e. draining as much liquidity as possible. 
     \item \textit{Pack hunters:} Predators hunting independently become aware of other activities and form pacts. In order to maximize the chance of triggering a cascading effect.   
 \end{enumerate}
 Some ways of measuring this is according to \textcite{de2018advances} to measure the cancellation rates of quotes, limit orders and market orders.
 
-\subsection{Cost and benefits}
-According to \textcite{kissell2013science} algorithmic trading a variety of benefits for investors such \textit{Lower commissions}, \textit{Anonymity}, \textit{Control}, {Reduced Transaction Costs} and \textit{Transparency}. Whilst main disadvantages according to \textcite{kissell2013science} is a more difficult price discovery.
+%\subsection{Cost and benefits}
+%According to \textcite{kissell2013science} algorithmic trading a variety of benefits for investors such \textit{Lower commissions}, \textit{Anonymity}, \textit{Control}, {Reduced Transaction Costs} and \textit{Transparency}. Whilst main disadvantages according to \textcite{kissell2013science} is a more difficult price discovery.
 
 \section{Reinforcement Learning}
 Reinforcement learning (RL) is learning what to do i.e. map situations to actions, in order to maximize a numerical reward function \parencite{sutton1998reinforcement}. Which is quite different from other machine learning methods based on \textit{supervised} or \textit{unsupervised} learning, where one in fact have the true labels or not.
@@ -437,12 +495,13 @@ Reinforcement learning (RL) is learning what to do i.e. map situations to action
     \label{fig:4}
 \end{figure}
 
-Reinforcement learning (RL) is about an agent interacting with the environment. By learning an optimal policy, by trial and error. For sequential decision making \parencite{li2017deep}. \autoref{fig:4} above illustrates a simple agent interacting with its environment. A RL agent interacts with its environment over time. At each time step $t$ the agent receives  a \textit{state} $S_t$ in a state space $\mathcal{S}$ and makes an \textit{action} $A_t$ from an action space $\mathcal{A}$ \parencite{li2017deep}. As a consequence of its action, the agent receives \textit{reward} $R_t$ which is a scalar value. The agent's goal is to maximize the total amount of cumulative reward it receives. This is know as the \textit{reward hypothesis} \parencite{sutton1998reinforcement}. The agent's behavior is modelled by the \textit{policy} $\pi(s|a)$. A policy is a mapping from a state to an action, that is the probability of selecting action $A_t=a$ if state $S_t = s$. 
+Simply put, RL is an agent interacting via actions with its environment, and by doing so eventually learning an optimal policy or behaviour. This learning process is by trial and error, for sequential decision making \parencite{li2017deep}. \autoref{fig:4} above illustrates a simple agent interacting with its environment. A RL agent interacts with its environment over time. At each time step $t$ the agent receives  a \textit{state} $S_t$ in a state space $\mathcal{S}$ and makes an \textit{action} $A_t$ from an action space $\mathcal{A}$ \parencite{li2017deep}. As a consequence of its action, the agent receives \textit{reward} $R_t$ which is a scalar value. 
 \newline
 \newline
-This also includes transitioning to the next state $S_{t+1}$ according to the environments dynamics or \textit{model} for a \textit{reward function} $\mathcal{R}(s,a)$ and \textit{state transition probability}
+The agent's goal is to maximize the total amount of cumulative reward it receives. This is know as the \textit{reward hypothesis} \parencite{sutton1998reinforcement}. The agent's behavior is modelled by the \textit{policy} $\pi(s|a)$. A policy is a mapping from a state to an action, that is the probability of selecting action $A_t=a$ if state $S_t = s$. This also includes transitioning to the next state $S_{t+1}$ according to the environments dynamics or \textit{model} for a \textit{reward function} $\mathcal{R}(s,a)$ and \textit{state transition probability} $\mathcal{P}(S_{t+1} |S_t, A_t)$ \parencite{li2017deep}.
+
 \subsubsection*{Markov Decision Process}
-$\mathcal{P}(S_{t+1} |S_t, A_t)$ \parencite{li2017deep}. More formally the RL problem is formulated as an \textit{Markov Decision Process} (MPD) \parencite{sutton1998reinforcement, li2017deep}. A MDP is a tuple $(\mathcal{S, A, P, R}, \gamma)$ \parencite{li2017deep}:
+ More formally the RL problem is formulated as an \textit{Markov Decision Process} (MPD) \parencite{sutton1998reinforcement, li2017deep}. A MDP is a tuple $(\mathcal{S, A, P, R}, \gamma)$ \parencite{li2017deep}:
 \begin{itemize}
     \item $\mathcal{S}$ is a finite set of states
     \item $\mathcal{A}$ is a finite set of actions
@@ -464,8 +523,8 @@ In general, we seek to maximize the \textit{expected return}. Where the return, 
     \label{eq:13}
     G_t = R_{t+1} + \gamma R_{t+2} + ... = \sum_{k=0}^{\infty}{\gamma^{k}R_{t+k+1}}
 \end{equation}
-The discount factor or discount rate in \autoref{eq:13} determines the present value of future rewards, $k$ steps in the future. Note that a $\gamma$ close to 0 leads to \textit{myopic} behavior i.e. the agent only cares about immediate rewards. Whilst if $\gamma$ is close to 1, the agent's is a bit more \textit{far-sighted}. When the agent-environment interaction breaks naturally into sub-sequences which is called \textit{episodes}
-\autoref{eq:13} makes sense.  Another key concept underlying RL is the \textit{Markov property} i.e. only the current state affects the next state \parencite{arulkumaran2017brief}. More formally this means:
+The discount factor or discount rate in \autoref{eq:13} determines the present value of future rewards, $k$ steps in the future. Note that a $\gamma$ close to 0 leads to \textit{myopic} behavior i.e. the agent only cares about immediate rewards. Whilst if $\gamma$ is close to 1, the agent's is a bit more \textit{far-sighted}. When the agent-environment interaction breaks naturally into sub-sequences, which are called \textit{episodes}.
+\autoref{eq:13} makes sense. Another key concept underlying RL is the \textit{Markov property} i.e. only the current state affects the next state \parencite{arulkumaran2017brief}. More formally this means:
 
 \begin{equation}
     \label{eq:13b}
@@ -475,7 +534,7 @@ The discount factor or discount rate in \autoref{eq:13} determines the present v
 
 \subsubsection*{Value Functions}
 
-Almost all RL algorithms involve estimating \textit{value functions} i.e. functions of states or state-action pairs. These estimate how god it is for an agent to be in a certain state \parencite{sutton1998reinforcement, li2017deep}. The value of a state $s$ under a policy $\pi$ denoted $v_{\pi}(s)$. Is the expected return when starting in $s$ and following $\pi$. Below is the \textit{state-value function for policy $\pi$}:
+Almost all RL algorithms involve estimating \textit{value functions} i.e. functions of states or state-action pairs. These estimate how god it is for an agent to be in a certain state \parencite{sutton1998reinforcement, li2017deep}. The value of a state $s$ under a policy $\pi$ is denoted $v_{\pi}(s)$. Is the expected return when starting in $s$ and following $\pi$. Below is the \textit{state-value function for policy $\pi$}:
 
 \begin{equation}
     \label{eq:14}
@@ -490,7 +549,7 @@ Note that the value of the terminal state is always zero \parencite{sutton1998re
 Both \autoref{eq:14} and \autoref{eq:15} can be estimated from experiences or by using \textit{Monte Carlo Methods} \parencite{sutton1998reinforcement}.
 
 \subsubsection*{Bellman equations \& Optimality}
-Both \autoref{eq:14} and \autoref{eq:15} satisfies recursive relationships. Which is commonly know as \textit{Bellman equations} \parencite{sutton1998reinforcement}:
+Both \autoref{eq:14} and \autoref{eq:15} satisfies recursive relationships. Which are commonly know as \textit{Bellman equations} \parencite{sutton1998reinforcement}:
 
 \begin{equation}
     \label{eq:16}
@@ -501,7 +560,7 @@ Both \autoref{eq:14} and \autoref{eq:15} satisfies recursive relationships. Whic
     \label{eq:17}
     q_{\pi} = E_{\pi}[R_{t+1} + \gamma G_{t+1} | S_t = s,  A_t = a]
 \end{equation}
-As we can see in \autoref{eq:16} and \autoref{eq:17} the Bellman equations expresses a relationship between the value of the state and its successor states. However solving a RL task means that we want to find a policy that achieves a lot of reward over the long run. We are thus looking for \textit{optimal policies} ($\pi \geq \pi'$). We denote all optimal policies with $\pi_{*}$ whom share the same state-value and action value-value functions \parencite{sutton1998reinforcement}. We thus want to maximize the following:
+As we can see in \autoref{eq:16} and \autoref{eq:17} the Bellman equations expresses a relationship between the value of the state and its successor states. However solving a RL task means that we want to find a policy that achieves a lot of reward over the long run. We are thus looking for \textit{optimal policies} ($\pi \geq \pi'$). We denote all optimal policies with $\pi_{*}$ whom share the same state-value and action-value functions \parencite{sutton1998reinforcement}. We thus want to maximize the following:
 
 \begin{equation}
     \label{eq:18}
@@ -536,20 +595,20 @@ E[R_{t+1} + \gamma \underset{a'}{\text{max }}q_{*}(S_{t+1, a'}) | S_t =s, A_t = 
 For a finite MDP \autoref{eq:20} and \autoref{eq:21} has a unique solution independent of the policy \parencite{sutton1998reinforcement}. Nevertheless, in practice there is no closed form solution for these equations. Therefore one must resort to approximate and iterative methods. That uses \textit{dynamic programming} or Monte Carlo methods.
 
 \subsection{Exploration versus Exploitation}
-In reinforcement learning we have a trade-off between \textit{exploration} and \textit{exploitation}. Where exploration refers to taking actions, that come from the current best version of the learned policy. Exploration instead is concerned with taking more actions to obtain more training data \parencite{goodfellow2016deep}. Where the dilemma is that neither exploration nor exploitation can be pursued exclusively without failing at the task \parencite{sutton1998reinforcement}. There exist some strategies to balance the trade-off between exploration and exploitation. By employing a \textit{greedy} approach i.e. choose the action with the highest payoff \parencite{sutton1998reinforcement, szepesvari2009algorithms}.
+There's a trade-off between \textit{exploration} and \textit{exploitation} when training a reinforcement learning agent. Where exploration refers to taking actions, that come from the current best version of the learned policy. Exploration instead is concerned with taking more actions to obtain more training data \parencite{goodfellow2016deep}. Where the dilemma is that neither exploration nor exploitation can be pursued exclusively without failing at the task \parencite{sutton1998reinforcement}. There exist some strategies to balance the trade-off between exploration and exploitation. By employing a \textit{greedy} approach i.e. choose the action with the highest payoff \parencite{sutton1998reinforcement, szepesvari2009algorithms}.
 
 \begin{equation}
     \label{eq:21a}
     A_t = \underset{a}{\operatorname{argmax}}Q_t(a)
 \end{equation}
-A simple modification of \autoref{eq:21a} is to fix $\varepsilon > 0$ and choose a random selected action. With probability $\varepsilon$ and go with the greedy choice else. This strategy is the $\varepsilon$-greedy one. Another approach is \textit{Boltzman exploration} \parencite{sutton1998reinforcement,szepesvari2009algorithms} which given the sample means of the actions at time $t$. The next action is drawn from the multinominal distribution of $\pi_t$, where 
+A simple modification of \autoref{eq:21a} is to fix $\varepsilon > 0$ and choose a random selected action. With probability $\varepsilon$ and go with the greedy choice otherwise. This strategy is the $\varepsilon$-greedy one. Another approach is \textit{Boltzman exploration} \parencite{sutton1998reinforcement,szepesvari2009algorithms} which given the sample means of the actions at time $t$. The next action is drawn from the multinominal distribution of $\pi_t$, where 
 
 \begin{equation}
     \label{eq:21b}
     P_t(a) = \frac{\exp{(q_{t}(a)/\tau)}}{ \sum_{i=1}^{n}{\exp{(q_{t}(i)/ \tau)}}} = \pi_t(a)
 \end{equation}
 Where $ \tau$ is a temperature parameter annealed over time.
-Finally there also exist approaches based on the \textit{optimism in the face of uncertainty}. According to which where the learner should choose the action with the best upper confidence bound (UCB) \parencite{sutton1998reinforcement, szepesvari2009algorithms}
+Finally there also exist approaches based on the concept, \textit{optimism in the face of uncertainty}. According to which where the learner should choose the action with the best upper confidence bound (UCB) \parencite{sutton1998reinforcement, szepesvari2009algorithms}
 
 \begin{equation}
     \label{eq:21c}
@@ -558,16 +617,14 @@ Finally there also exist approaches based on the \textit{optimism in the face of
 Where $t$ is the time, $c$ controls the degree of exploration and $N_t(a)$ is the number of times that action $a$ has been selected \parencite{sutton1998reinforcement}.
 
 \subsection{Algorithms \& Learning in RL}
-One can characterize RL problems into two main classes: \textit{prediction} and \textit{control} where each is followed by different approaches as \textit{value iteration, policy iteration} and \textit{policy search} \parencite{szepesvari2009algorithms}. 
-\newline
-These different approaches uses different algorithms. Note that all these algorithms are implemented in both \parencite{plappert2016kerasrl, baselines} libraries used in the thesis. In general deep reinforcement learning is based on the algorithms below, but with deep neural networks. To approximate $V^{*}, Q^{*}$ and $A^{*}$ \parencite{arulkumaran2017brief}. 
+One can characterize RL problems into two main classes: \textit{prediction} and \textit{control} where each is followed by different approaches as \textit{value iteration, policy iteration} and \textit{policy search} \parencite{szepesvari2009algorithms}. These different approaches uses different algorithms. Note that all these algorithms are implemented in both \parencite{plappert2016kerasrl, baselines} libraries used in the thesis. In general deep reinforcement learning is based on the algorithms below, but with deep neural networks. To approximate $V^{*}, Q^{*}$ and $A^{*}$ \parencite{arulkumaran2017brief}. 
 
 %neeed this? maybe put in appendix..
 \subsubsection*{Dynamic Programming \& Monte Carlo Methods}
 In order to find optimal solutions for \autoref{eq:20} and \autoref{eq:21} we must resort to using approximate methods as dynamic programming. The key idea of dynamic programming is to use the value functions to organize and structure the search for good policies \parencite{sutton1998reinforcement, szepesvari2009algorithms}. Once a policy $\pi$ has been improved using $v_{\pi}$ to yield a better policy,  $\pi'$. We can then compute $v_{\pi}'$ and improve it again to yield policy $\pi^{''}$ \parencite{sutton1998reinforcement}. This is what \textit{policy iteration} is about and is described more in \autoref{alg1} found in \autoref{app:A}.
 \newline
 \newline
-One drawback with \autoref{alg1} is that is quite computationally expensive as it involves policy evaluation over the state space \parencite{sutton1998reinforcement}. A remedy for this is \textit{value iteration}. Where the basic idea is to use early stopping i.e. one update of each state. Which is shown in \autoref{alg2} in \autoref{app:A}. Conversely \textit{Monte Carlo methods} (MCM) require only experience i.e. sample sequences of states, actions, and rewards. From actual or simulated interaction with the environment \parencite{sutton1998reinforcement}. MCM solves reinforcement learning problems based on averring sample returns. 
+One drawback with \autoref{alg1} is that is quite computationally expensive as it involves policy evaluation over the state space \parencite{sutton1998reinforcement}. A remedy for this is \textit{value iteration}. Where the basic idea is to use early stopping i.e. one update of each state. Which is shown in \autoref{alg2} in \autoref{app:A}. Conversely \textit{Monte Carlo methods} (MCM) require only experience i.e. sample sequences of states, actions, and rewards. From actual or simulated interaction with the environment \parencite{sutton1998reinforcement}. MCM solves reinforcement learning problems based on averaging sample returns. 
 
 
 \subsubsection*{Q-Learning \& SARSA}
@@ -577,7 +634,7 @@ One drawback with \autoref{alg1} is that is quite computationally expensive as i
     \label{eq:22}
     V(S_t) \leftarrow V(S_t) + \alpha \left[R_{t+1} + \gamma V(S_{t+1} - V(S_t) \right]
 \end{equation}
-This idea is applicable both to \textit{Q-Learning} and \textit{State-action-reward-state-action} (SARSA) which are both cases of TD learning. However Q-Learning is a \textit{off-policy} method whilst SARSA is an \textit{on-policy method} \parencite{sutton1998reinforcement, arulkumaran2017brief}. Now we are interested in learning an \textit{action-value} function which we estimate with $Q^{}$, instead of a state-value function. The update rule for SARSA is given below in \autoref{eq:23}:
+This idea is applicable both to \textit{Q-Learning} and \textit{State-action-reward-state-action} (SARSA) which are both cases of TD learning. However Q-Learning is a \textit{off-policy} method whilst SARSA is an \textit{on-policy method} \parencite{sutton1998reinforcement, arulkumaran2017brief}. On-policy methods attempt to evaluate or improve the policy used to make decisions. Whilst off-policy methods instead evaluates or improve a policy different from that used to generate the data \parencite{sutton1998reinforcement}. In other words, on-policy methods estimate the value of a policy while using it for control. Off-policy methods uses two separate policies instead. One called \textit{behavioral policy} and the other \textit{target policy} \parencite{sutton1998reinforcement}. Now we are interested in learning an \textit{action-value} function which we estimate with $Q^{}$, instead of a state-value function. The update rule for SARSA is given below in \autoref{eq:23}:
 
 \begin{equation}
     \label{eq:23}
@@ -585,15 +642,15 @@ This idea is applicable both to \textit{Q-Learning} and \textit{State-action-rew
 \end{equation}
 Q-learning instead estimates  $q_{*}$ \footnote{The optimal action-value function} with the learned action-value function $Q$ independent of the policy being followed \parencite{sutton1998reinforcement}. 
 %\newpage
-The main update rule for \textit{Q-learning} is given below in 
+The main update rule for \textit{Q-learning} is given below in \autoref{eq:24}
 
 \begin{equation}
     \label{eq:24}
      Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[R_{t+1} + \gamma \underset{a}{\operatorname{max}} Q(S_{t+1}, a) - Q(S_t, A_t) \right]
 \end{equation}
 
-\subsubsection*{Deep Q Networks (DQN}
-In \textcite{mnih2015human} from Google DeepMind created Deep Q Learning (DQN). Which replaces the $Q$ function with a neural network called \textit{Q-network}. This method also keeps track of some observations in memory which is called \textit{experience replay} \parencite{mnih2015human}. The agents experience is stored $e_t = (s_t, a_t, r_t, s_{t+1})$ at each time step in a data set $D_t = \{e_1, ..., e_t\}$. Where on Q-learning updates the experience is drawn uniformly \parencite{mnih2015human}. They use a deep convolutional network to the approximate optimal action-value function $Q^{*}$. The Q-learning update at iteration $i$ uses the loss function in \autoref{eq:25} below:
+\subsubsection*{Deep Q Networks (DQN)}
+In \textcite{mnih2015human} they present Deep Q Learning (DQN). Which replaces the $Q$ function with a neural network called \textit{Q-network}. This method also keeps track of some observations in memory which is called \textit{experience replay} \parencite{mnih2015human}. The agents experience is stored $e_t = (s_t, a_t, r_t, s_{t+1})$ at each time step in a data set $D_t = \{e_1, ..., e_t\}$. Where on Q-learning updates the experience is drawn uniformly \parencite{mnih2015human}. They use a deep convolutional network to the approximate the optimal action-value function $Q^{*}$. The Q-learning update at iteration $i$ uses the loss function in \autoref{eq:25} below:
 
 \begin{equation}
     \label{eq:25}
@@ -604,14 +661,13 @@ Where $\gamma$ is the discount factor, $\theta_i$ are the parameters of the Q-ne
 %add full algorithm here
 
 \subsubsection*{Policy Gradients \& Proximal Policy Optimization (PPO)}
-Policy gradients methods work by  directly computing an estimate of the gradient of policy parameters in order to maximize the expected return. This by using stochastic gradient descent \parencite{bansal2017emergent}. 
-Policy gradient methods work by computing an estimator of the policy gradient and plugin it in to a stochastic gradient ascent algorithm \parencite{schulman2017proximal}. The most common estimator is shown below in \autoref{eq:26}
+Policy gradients methods work by directly computing an estimate of the gradient of policy parameters in order to maximize the expected return. This by using stochastic gradient descent \parencite{bansal2017emergent, schulman2017proximal}. The most common estimator is shown below in \autoref{eq:26}
 
 \begin{equation}
     \label{eq:26}
     \hat{g} = \hat{\mathbb{E}}_{t}\left[\nabla_{\theta} \log{\pi_{\theta}(a_t|s_t)\hat{A}_{t}} \right]
 \end{equation}
-Where $\pi_{\theta}$ is a stochastic policy and $\hat{A}_{t}$ is an estimator of the advantages function at timestep $t$. The advantage function is shown below in \autoref{eq:27}:
+Where $\pi_{\theta}$ is a stochastic policy and $\hat{A}_{t}$ is an estimator of the advantages function at time-step $t$. The advantage function is shown below in \autoref{eq:27}:
 
 \begin{equation}
     \label{eq:27}
@@ -623,11 +679,11 @@ In \textcite{schulman2017proximal} they propose a new family of policy gradient 
     \label{eq:28}
     L_{t}^{CLIP + VF+ S}(\theta) = \hat{\mathbb{E}_{t}} = \left[L_{t}^{CLIP}(\theta) + c_1 L_{t}^{VF}(\theta) + c_2S[\pi_{\theta}(s_t)]\right]
 \end{equation}
-Where $c_1,c_2$ are coefficients, and S is an entropy bonus. $L_{t}^{CLIP}$ is the clipped surrogate objective and $L_{t}^{VF}$ is a squarred-error loss \parencite{schulman2017proximal}.
+Where $c_1,c_2$ are coefficients, and S is an entropy bonus. $L_{t}^{CLIP}$ is the clipped surrogate objective and $L_{t}^{VF}$ is a squared-error loss \parencite{schulman2017proximal}.
 %add full algorithm here
 
 \subsection{Competitive Self-Play}
-Many real-world applications can be described as large-scale of games of imperfect information. A game is a domain of conflict for cooperation between several entities \parencite{heinrich2016deep}. Where the optimal solutions for these types of situations would be Nash equilibrium. That is an strategy from which no agent would choose to deviate \parencite{heinrich2016deep}. This is where self-play comes in. In short self-play is the activity of imagining or simulating the play of a game against oneself \parencite{heinrich2017reinforcement}. This concept is also based on the idea of \textit{fictitious play}.  Where fictitious players choose best responses to their opponents' average behaviour \parencite{heinrich2016deep}. 
+Many real-world applications can be described as large-scale games of imperfect information. A game is a domain of conflict for cooperation between several entities \parencite{heinrich2016deep}. Where the optimal solutions for these types of situations would be Nash equilibrium. That is an strategy from which no agent would choose to deviate \parencite{heinrich2016deep}. This is where self-play comes in. In short self-play is the activity of imagining or simulating the play of a game against oneself \parencite{heinrich2017reinforcement}. This concept is also based on the idea of \textit{fictitious play}.  Where fictitious players choose best responses to their opponents' average behaviour \parencite{heinrich2016deep}. 
 \newline
 \newline
 \textcite{tampuu2017multiagent} also mentioned that self-play is any type of play against an \textit{adaptive agent}. Typically agents are first trained in a supervised manor, with self-play as a second phase of training. In \textit{Fictious Self-Play} (FSP) on the other hand the agents generate datasets of their experience in self-play \parencite{heinrich2016deep}.  Each agent stores transition tuples $(s_t, a_t, r_{t+1}, s_{t+1})$ in a memory $\mathcal{M}_{RL}$ for reinforcement learning (confer experience replay). Experience of the agent's own behaviour $(s_t, a_t)$ is stored in a separate memory for supervised learning $\mathcal{M}_{SL}$ \parencite{heinrich2016deep}.
@@ -640,13 +696,13 @@ Many real-world applications can be described as large-scale of games of imperfe
     \item When training with self-play the environment provides the agents with  a perfect curriculum.
 \end{enumerate}
 
-%mention where it has been succesfully used and show the need of the application that we want to use here for the thesis
+%mention where it has been successfully used and show the need of the application that we want to use here for the thesis
 %\subsection{RL in Market Microstructure}
 
 \newpage
 
 \subsection{Issues with deep RL}
-There's a lot of hype around using reinforcement learning, and specially deep reinforcement learning. Which is the closes that we have today to \textit{Artificial General Intelligence}. Some of the major issues are presented below:
+The use of reinforcement learning, and specially deep reinforcement learning. Has been quite glorified for some time. Which is the closes that we have today to \textit{Artificial General Intelligence}. However training and using reinforcement learning is not trivial. Where some of the major issues are presented below:
 
 \begin{enumerate}
     \item \textit{Deep RL can be sample inefficient}. Reinforcement learning has its own planning fallacy. Learning a policy usually needs more sample then what one thinks \parencite{irpan_2018}. Simulations run on the popular MuJoCo physics environment need for instance between $[10^5, 10^7]$ steps to learn different task \parencite{heess2017emergence}.
@@ -667,7 +723,7 @@ There's a lot of hype around using reinforcement learning, and specially deep re
 %\subsection{Monte Carlo Tree Search (MCTS)}
 
 %own chapter?
-\chapter{Related Work}
+\chapter{Related Work}\label{ch:3}
 In this chapter previous related work is presented. To give a view over what has been done previously as well as current state of the art. Also the difference between this work and previous work is discussed. The chapter is divided into the following sections: \textit{Agent Financial Markets, Market Microstructure} and \textit{Reinforcement Learning in Finance}.
 
 \section{Agent based Financial Markets}
@@ -679,13 +735,13 @@ Good overviews of agent based modelling in a financial setting, is given in \par
 Where genetic programming seems to be the core learning process employed and decision trees. A difference between the study by \textcite{martinez2009evolutionary} and this thesis, is that the environment used will be more complex. With a matching engine and different algorithmic trading strategies as market making and HFT trading. To successfully study market microstructure phenomena. We will also use reinforcement learning for learning used by the agents in the complex environment. Generally speaking there are two major approaches to agent-based financial market simulations, where the first one focuses on specific market structure. Whilst the second approach is more focused on generating a flexible environment with flexible settings for the agents employed \parencite{brandouy2011design}. This thesis will focus more on the second approach in order to see what type of behaviour the agents exhibit exposed to different market conditions. 
 \newline
 \newline
-In \textcite{brandouy2011design} they design a artificial stock market called ATOM based on the Euronext-NYSE Stock exchange, with the possibility to add ''human agents''. They have for instance a limit order-book as the thesis aim to use, but it is unclear whether they employ a functional matching engine. Which this study will use, by using the parity engine \footnote{\url{http://paritytrading.com/}}. They also use different types of agents for instance \textit{zero intelligence traders, technical traders, evolutionary agents, risk averse agents} and \textit{mean-variance agents}. 
+In \textcite{brandouy2011design} they design a artificial stock market called ATOM based on the Euronext-NYSE Stock exchange, with the possibility to add ''human agents''. They have for instance a limit order-book as the thesis aim to use, but it is unclear whether they employ a functional matching engine. Which this study will use, by using the a simulated limit orderbook market. They also use different types of agents for instance \textit{zero intelligence traders, technical traders, evolutionary agents, risk averse agents} and \textit{mean-variance agents}. 
 \newline
 \newline
-Nevertheless, none of these are based on reinforcement learning or competitive self-play as will be used in this thesis. One of the main benefits with using agent based modelling is that they demonstrate the ability to produce realistic system dynamics, which are comparable to those observed empirically \parencite{platt2016problem}. In their study the calibrate their agents by using heuristic optimization , Nelder-Mead simplex algorithm and a genetic algorithm. They use a simpler form of matching engine, not as elaborated as the parity engine. They also only use a low-frequency trader and high-frequency trader. Where this thesis may use one or several different types of traders
+Nevertheless, none of these are based on reinforcement learning or competitive self-play as will be used in this thesis. One of the main benefits with using agent based modelling is that they demonstrate the ability to produce realistic system dynamics, which are comparable to those observed empirically \parencite{platt2016problem}. In their study the calibrate their agents by using heuristic optimization , Nelder-Mead simplex algorithm and a genetic algorithm. They use a simpler form of matching engine in their study. They also only use a low-frequency trader and high-frequency trader. Where this thesis may use one or several different types of traders
 
 \section{Market Microstructure}
-Market microstructure studies the process by which investors' latent demands are ultimately translated into prices and volumes \parencite{madhavan2000market}. It is of importance for this thesis to understand market microstructure both theoretically and empirical. In order to replicate and even find new interesting behaviour of the agents, employed in this kind of environment. In \textcite{haferkorn2017high, agarwal2012high} the effect of HFT trading and fragmentation is discussed. Which is of interest for market micro-structure. This as fragmentation leads to more competition on the markets. That might be demonstrated by the agents. Some common references that have been and are still used in the state of the art market microstructure research is \parencite{o1995market,hasbrouck2007empirical, madhavan2000market, madhavan2002market}. There both \textit{inventory-based} and \textit{information based} models are discussed. In this thesis both an inventory-based and information based model will be used as a benchmark, for the learning agents. 
+Market microstructure studies the process by which investors' latent demands are ultimately translated into prices and volumes \parencite{madhavan2000market}. It is of importance for this thesis to understand market microstructure both theoretically and empirical. In order to replicate and even find new interesting behaviour of the agents, employed in this kind of environment. In \textcite{haferkorn2017high, agarwal2012high} the effect of HFT trading and fragmentation is discussed. Which is of interest for market micro-structure. This as fragmentation leads to more competition on the markets. That might be demonstrated by the agents. Some common references that are used in the state of the art market microstructure research is found in \parencite{o1995market,hasbrouck2007empirical, madhavan2000market, madhavan2002market}. There both \textit{inventory-based} and \textit{information based} models are discussed. In this thesis we focus on inventory-based models, for the learning agents. However information based model will can be used in future studies.
 \newline
 \newline
 A common inventory-based model, that uses dynamic programming to find the optimal dealer price in a one-dealer market. Is given in \textcite{ho1981optimal}. A problem with the model in \parencite{ho1981optimal} is that here is no closed form solution, thus approximations is used to get arbitrarily close to the solution. By using reinforcement learning we hope to be able to replicate the behaviour of the agents shown in the previous paper. However, also extending it, and see how the agents perform and behave in a more complex market. With several dealers for instance. The information based models on the other hand tries to incorporate the element that some traders are more informed than others. Which is called \textit{asymmetric information} or \textit{adverse selection} in the market microstructure literature \parencite{o1995market, hasbrouck2007empirical}. 
@@ -701,7 +757,7 @@ We will be training our agents on an environment similar to the one described in
 Reinforcement learning or \textit{neuro-dynamic programming} as it also have been called in the literature. Have been used previously in a financial setting. Where some of the earlier applications have been in trading. In \textcite{moody1999reinforcement} the author's explore the opportunity of using reinforcement learning for trading. Using Recurrent Reinforcement Learning (RRL) and Q-learning and looking at the S\& P 500 index. Not that much focus is on trading dynamics. Which will be the main focus of  this thesis, on a completely different market. In \parencite{dempster2006automated, du2016algorithm, wang2016reinforcement, casqueiro2006neuro, bertoluzzo2012testing} they discuss the usages of different types of reinforcement learning algorithms for trading. Where trading is done in for example foreign exchange or the energy market. None of these use a matching engine, or a more complex environment with several HFT/market maker agents. Or with the possibility of completely changing the market conditions. Which this thesis aims to do. 
 \newline
 \newline
-In \textcite{kearns2013machine} they give a good overview of reinforcement learning used in market microstructure and high-frequency trading. With use-cases in optimized trade execution, prediction of price movements and optimized execution in dark pools. Nevertheless none of these studies are using competitive self-play in their learning. In \parencite{nevmyvaka2006reinforcement, hendricks2014reinforcement}  optimized trade execution is studied with the help of reinforcement learning. Which is of importance in market microstructure and might be examined in this thesis. However for this thesis one of the main objectives is to understand and successfully replicate know behaviour of traders in a dynamic market. Where some studies concerned with understanding the behaviour of traders are presented in \parencite{yang2014algorithmic, yang2012behavior}. 
+In \textcite{kearns2013machine} they give a good overview of reinforcement learning used in market microstructure and high-frequency trading. With use-cases in optimized trade execution, prediction of price movements and optimized execution in dark pools. In \parencite{nevmyvaka2006reinforcement, hendricks2014reinforcement}  optimized trade execution is studied with the help of reinforcement learning. Which is of importance in market microstructure and might be examined in this thesis. However for this thesis one of the main objectives is to understand and successfully replicate know behaviour of traders in a dynamic market. Where some studies concerned with understanding the behaviour of traders are presented in \parencite{yang2014algorithmic, yang2012behavior}. 
 \newline
 \newline
 Where they use \textit{inverse reinforcement learning} on trading decisions. The idea is to find the reward function given the observations of optimal trading behaviour and then use it for trader identification. 
@@ -709,49 +765,85 @@ Although interesting this thesis is not interested in capturing key characterist
 \newline
 \newline
 In \textcite{cartea2015algorithmic} some common algorithmic trading strategies are presented, focusing on stochastic optimal control.
-A previous study has been done at NASDAQ investigating the effects of tick size changes \textcite{darley2007nasdaq}. Where the strategies employed where a simpler form of reinforcement learning, together with dynamic programming approaches. This study is of-course used as an inspiration, but the thesis will be different in that it incorporates a more realistic market. With the matching engine, and several different types of agents. When modelling stock agents some previous studies conducted are \parencite{pastore2015modelling, rutkauskas2009building}. This study aims to do the something similar, but on the Nordic stock market. As this study want's to understand the trading dynamics for example market makers and algorithmic traders. 
+A previous study has been done at NASDAQ investigating the effects of tick size changes \textcite{darley2007nasdaq}. Where the strategies employed where a simpler form of reinforcement learning, together with dynamic programming approaches. Which works as inspiration for this study. However the thesis will be different in that it incorporates a more realistic simulated market. With the matching engine, and several different types of agents. When modelling stock agents some previous studies conducted are \parencite{pastore2015modelling, rutkauskas2009building}. This study aims to do the something similar, but on the Nordic stock market. As this study want's to understand the trading dynamics for example market makers and algorithmic traders. 
 \newline
 \newline
-Nevertheless, in order to train the agents in the trading environments, we need to understand reinforcement learning. In \parencite{arulkumaran2017brief, mnih2015human, li2017deep} good overviews of the current state of the art deep reinforcement learning (RL) is presented.  Recently some of the state of the art research, has been driven by DeepMind and their work with the game Go. See for instances \parencite{silver2016mastering, silver2017mastering, vinyals2017starcraft}, that serves as inspiration of best practices. Competitive self-play is introduced and examined in \parencite{bansal2017emergent, schulman2017proximal}. Which is the main idea to be examined in this thesis. However applied to the Nordic financial market instead of games. In \parencite{busoniu2008comprehensive, bucsoniu2010multi} some of the most common multiagent reinforcement learning strategies are discussed. Where this thesis will use a multiagent approach too, when training several agents. That will interact and competent with each other. 
+Nevertheless, in order to train the agents in the trading environments, we need to understand reinforcement learning. In \parencite{arulkumaran2017brief, mnih2015human, li2017deep} good overviews of the current state of the art deep reinforcement learning (RL) is presented.  Recently some of the state of the art research, has been driven by DeepMind and their work with the game Go. See for instances \parencite{silver2016mastering, silver2017mastering, vinyals2017starcraft}, that serves as inspiration of best practices. Competitive self-play is introduced and examined in \parencite{bansal2017emergent, schulman2017proximal}. In \parencite{busoniu2008comprehensive, bucsoniu2010multi} some of the most common multiagent reinforcement learning strategies are discussed. 
 
-\chapter{Research Summary}
+\chapter{Research Summary}\label{ch:4}
+In this chapter, a summary of the research methodology is provided. An overview of the research process is found in \autoref{fig:1}
 
-\section{Research Question}
+\section{Research Methodology}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.9]{Imgs/researchmethodsv2.PNG}
+    \caption{Overview of the different research methodology stages conducted during the thesis.}
+    \label{fig:r1}
+\end{figure}
+
+\subsection{Research Question}
 The research question for this thesis is shown below:
 
 \begin{RQ}
 Will trading dynamics such as the bid-ask spread clustering, optimal trade execution and optimal inventory costs be exhibited \& learned by reinforcement learning agents using competitive self-play on a simulated Nordic stock market.
 \end{RQ}
 
-\section{Research Challenges}
-
-\section{Research Methodology}
-
-\subsection{Overview}
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=1]{Imgs/researchmethodsv2.PNG}
-    \caption{Overview of the different research methodology stages conducted during the thesis.}
-    \label{fig:r1}
-\end{figure}
-
 \subsection{Research Goals}
+The overall \textit{goal} of this thesis is to understand trading dynamics on a simulated market, when market conditions are changed. This goal can be divided into two research goals:
 
-\subsection{Research Methods}
+\begin{RG}
+Be able to simulate the effect of any change to market structure.
+\end{RG}
+
+\begin{RG}
+Applying reinforcement learning to a more complicated environment such as the financial markets.
+\end{RG}
+
+\subsection{Research Challenges}
+When conducting this research some research challenges have been identified and somewhat dealt with:
+\begin{RC}
+Simulating a realistic limit orderbook.
+\end{RC}
+With the current implementations of different reinforcement learning libraries. There doesn't exist any pre-built limit order market environments. The first idea was to use parity a java based exchange engine \footnote{\url{https://github.com/paritytrading/parity}}. However it turned out to be quite difficult to use this as an environment. As it would need some coding to create a wrapper. To target this challenge, we created our own limit order market environment. With an orderbook and matching engine. Inspired by how the NASDAQ limit orderbook market works.
+
+\begin{RC}
+Training and accurate learning of agents. 
+\end{RC}
+
+Training reinforcement learning agents can be quite difficult and requires both time and tuning of parameters, reward functions and other quantities of interest. 
+\newpage
+As well as a lot of computing power to facilitate training. To target this challenge, we tried to monitor how the agent was thinking. By visualizing the agents action at each time-step. See more in \autoref{ch:5}. We also monitored the mean, standard deviation and other algorithm related metrics at the end of each episode. To tune hyper parameters we used random search. We also looked at how many time steps each episode had. In order to understand if the agent solved the problem faster or lost more often.
+
+\begin{RC}
+Creating accurate rewards, to guide the agents actions.
+\end{RC}
+Shaping rewards in a accurate way so that an agent learns a wanted behaviour is not easy. Which is still an active research field today. As bad design of rewards can lead to overfitting, see more in \autoref{ch:2}. To target this challenge, therefore we have used \textit{sparse rewards}.
+
+\section{Research Methods}
+The choice of methods shown in \autoref{fig:r1} is based on using the portal in \parencite{haakansson2013portal}. The work in this thesis is performed using quantitative research. By conducting various experiments in the different agent environments. To test the behaviour of these agents using different tests and hypothesis \parencite{haakansson2013portal}. The different environments are covered in more depth in \autoref{ch:5}. However, we are also trying to establish relationships between different variables which is seen as experimental research \parencite{haakansson2013portal}.  Running all simulations results in big amounts of data. That needs to be examined, processed and analyzed. Therefore this thesis use deductive reasoning to compare and test this thesis results to previous studies. Finally statistics are used to analyze the collected data and evaluating its significance.
 
 \subsection{Literature Study}
+For the literature study, mainly available databases such as IEEE, arkivX.org, Google Scholar and Science-Direct have been used. To get access to the state of the art. Some searching throughout the web on for example blogs. That recommended certain papers or cases, and there references will be identified. Some books on market microstructure has been provided by the principal. Three information streams have been identified as relevant \textit{Artificial Financial Markets, Market Microstructure} and \textit{Reinforcement Learning in Finance}. After a first initial search, some 25 papers have been found to be relevant. Where the most relevant papers has already been covered in \autoref{ch:3}.
 
 \subsection{Implementation, Experiments \& Evaluation}
+Regarding the technical implementation, experiments and evaluation. This is covered more deeply in \autoref{ch:5}. However from a methodological standpoint, some discussion about these are presented here in the next sections.
 
 \section{Validity}
+In this section we reason about validity. Covering both construct, internal and conclusion validity. This is of importance as we need to devise tests. To make sure that the simulated data, from each simulation is valid. Validity in short indicates the degree to which an instrument measures what it is supposed to measure \parencite{kothari2004research}.
 
 \subsection{Construct Validity}
+A measure is said to posses construct validity to the degree that it confirms to predicted correlations with other theoretical propositions \parencite{kothari2004research}. In other words if the measure behaves as the theory says. In this thesis we compare our results with what is stated in previous studies and literature. To enforce this.  
 
 \subsection{Internal Validity}
+Internal validity is avoiding \textit{experimental artifacts} in experiments. Which is an interpretation of an experiment that is a mere illusion. However also avoiding confounding variables \footnote{an independent variable that has not been taken into account effecting dependent variables.} that can introduce biases and increased variance. Indeed internal validity is connected to experimental control of background conditions, following research paradigms and using relevant features. As we are doing simulations, we have the possibility to limit and change the number of relevant parameters. By changing the parameters throughout our experiments we examine the effect of these closely. In order to handle and avoid experimental artifacts.
 
 \subsection{Conclusion Validity}
+Conclusion validity is a measurement of the extent to which conclusions about relationships of variables are reasonable. This is connected to the analysis of the collected data \parencite{trochim_2006}. In this thesis we employ regression analysis to look at for instance price impact. To determine relationships between some of the variables. We also look at the correlation between some of the variables. As well as discussing the obtained results with people having subject matter in market microstructure.
 
-\chapter{Implementation \& Experiments}
+\section{Ethics}
+Ethics independent of quantitative or qualitative research is the moral principles in planning, conducting and reporting results of research studies \parencite{haakansson2013portal}.
+
+\chapter{Implementation}\label{ch:5}
 
 \section{Overview}
 %add flowchart here
@@ -763,18 +855,47 @@ Will trading dynamics such as the bid-ask spread clustering, optimal trade execu
 \end{figure}
 In this chapter the implementation and experiments on the different agents and environments used are described. In \autoref{fig:i1} an overview is provided. Which will be addressed more thoroughly in the following sections.
 
-\section{Environments \& Data}
-Even-though if OpenAI gym provides a lot of great environments to start with. We had to build our own OpenAI environments used throughout the thesis. These are implemented following the papers presented in the background section from \textcite{ho1981optimal} and .. The environments that will be presented are \textit{DealerMarket-v1, DealerMarket-v2 and LOBMarket-v1}
+\section{Environments \& Experiments}
 
-\subsection{DealerMarket-v1}
-In the first version of the DealerMarket we have built our own OpenAI environment in python. This environment is inspired by the ideas underpinning \textcite{ho1981optimal}. This environment is a single agent that's a dealer or market maker. The agent has four possible actions:
+\begin{table}[H]
+\centering
+\caption{Major differences between the environments, where $a_t$ is what action, $h_t$ how much history given i.e. the last frames. Each environment is seen as a way of changing the market structure for the agents.}
+\label{tab:e11}
+\begin{tabular}{llllllllll}
+Agent & $a_t$  & $\sigma$  & $\lambda$  & Reward  & Offset  & Slope  & $h_t$  & Funds & Inventory  \\ \hline
+ dmv1 & 4  & 0.2  & 10  & \autoref{eq:m7}  & 10  & -  &  10 & $10^6$ & $1000$ \\
+ dmv2 & 6  & 1.5  & 5  & \autoref{ls:1}  & 8  & 0.5  & 10  & $10^6$ & $1000$ \\
+ lobv1& 10 & 2.0  & 150  & \autoref{ls:2} & 8  & 5  & 10  & 200 & $2\cdot 10^5$
+\end{tabular}
+\end{table}
+
+We had to implement our own OpenAI environments used throughout the thesis. In order to simulate both dealer markets and limit orderbook markets. Which are based on the papers presented in the background section. 
+\newline
+\newline
+The environments used are \textit{ DealerMarket-v1, DealerMarket-v2 and LOBMarket-v1}. The main differences between these are shown above in \autoref{tab:e11}.
+Nevertheless the same types of experiments have been run for each environment:
+
 \begin{enumerate}
-    \item Move bid up $(0)$
-    \item Move bid down $(1)$
-    \item Move ask up $(2)$
-    \item Move ask down $(3)$
+    \item \textit{Firstly}, by running the models for a shorter period of time to find relevant hyper-parameters using random search. For some 100 iterations, simulating the runs for some 200-500 episodes of a maximum 10 000 intervals.
+    
+    \item \textit{Secondly} training the models for some two million steps for intervals of 10 000 to collect data, monitor and visualize learning of agent. Also using three different random seeds in order to take into account randomness in the results. 
+    
+    \item\textit{Thirdly} testing the environment on a random agent/policy to use as benchmark against the trained agents.
+    
+    \item   \textit{Finally} performing statistical test and price impact regression on the collected data to see if phenomena from the literature can be found.
 \end{enumerate}
-There are no hidden states in this environment, as we wanted to make it fairly easy for the agent. In order to use this as a benchmark to other environments and agents. The agent have the following observed state variables: \textit{volume imbalance, offset imbalance, inventory imbalance, spread, wealth} and \textit{share value}. Each called $[ibv, ibo, ibif,sp, w,v]$ hereafter. These are defined below:
+
+\newpage
+\subsection{DealerMarket-v1}
+This environment is inspired by the ideas underpinning \textcite{ho1981optimal}. Meaning that the equilibrium price is following a Brownian motion with $\sigma$.  A changing demand curve controlled by the slope parameter in \autoref{tab:e11}. Where orders arrive according to a Poisson distribution based on the demand curve. These parameters are all changing after each episode.  
+\newline
+\newline
+In this environment, there's only a single agent that's a dealer or market maker. The agent has four possible actions: Move bid up $(0)$, Move bid down $(1)$, Move ask up $(2)$ and Move ask down $(3)$. There are no hidden states in this environment, as we wanted to make it fairly easy for the agent. In order to use this as a benchmark to other environments and agents. 
+\newline
+\newline
+As input (only the last 10 frames), the agent has the following observed state variables: \textit{volume imbalance, offset imbalance, inventory imbalance, spread, wealth} and \textit{share value}. 
+%\newpage
+Each called $[ibv, ibo, ibif,sp, w,v]$ hereafter. Defined below:
 \begin{equation}
 \label{eq:m1}
     ibv = (\text{last at bid - last at ask})/(\text{last at bid + last at ask})
@@ -804,63 +925,120 @@ There are no hidden states in this environment, as we wanted to make it fairly e
 \label{eq:m6}
     v = \text{share value}
 \end{equation}
-The state variables in \autoref{eq:m1} to \autoref{eq:m6} are changing thought the training of the agent. Where the agents goal is to optimize its reward ($rwd$):
+The state variables in \autoref{eq:m1} to \autoref{eq:m6} are changing throughout the training of the agent. The agents goal is to optimize its reward, shown in \autoref{eq:m7}. 
 
 \begin{equation}
     \label{eq:m7}
     Reward = \Delta \text{inventory} + \Delta funds
 \end{equation}
-hence optimizing the change of the agents reward without no mark-to-market at every time-step. The agent is given an initial amount of funds of $100000$ and initial inventory of $1000$ and the initial value of the simulated stock is $1000$. Each simulation was then ran for two million episodes. With three different random seeds as reinforcement learning is known to be fragile. The neural network used is shown below:
-\newline
-\newline
-The optimizer used was Adam with a learning rate, $\lambda =10^-{5}$. Memory of $100000$ units. MaxBoltzmann Policy with $\tau=0.25, \epsilon=0.1$. After training the agent we tested the agent with the pre-trained weights on the environment for 500 steps or simulations of 10 000 intervals. This in order to see if the agent had learned or not learned something. To calculate confidence intervals for the reward.
+Hence optimizing the change of the agents reward without no mark-to-market at every time-step. The agent is given an some initial as seen in \autoref{tab:e11}. After training the agent was tested,  with the pre-trained weights. Again on the environment for 500 steps or simulations of 10 000 intervals. This in order to see if the agent had learned or not learned something. 
+
+%\newpage
+
 \subsection{DealerMarket-v2}
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+	    	\centering
+		%The code to input the plot is extremely simple
+		\input{Imgs/hist_train_ref_price_dmv2.tex}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Example showing the change in reference price for the DealerMarket-v2 environment. }
+		\label{fig:rprice}
+\end{figure}
+In this version of the environment we have the following actions: Move bid up $(0)$, Move bid down $(1)$, Move ask up $(2)$,  Move ask down $(3)$,  Move ref price up $(4)$ and Move ref price down $(5)$. In \autoref{fig:rprice}, the change in ref price is shown. This is used to simulate price changes in the stock price. Also as seen in \autoref{tab:e11} this environment is a bit more volatile and uses a different reward function. Thus providing a more complicated environment for the agent to learn. See the reward function in \autoref{ls:1}. In practice we give the agent $(+1)$ for each share worth of wealth at the end of a an episode. While we penalize the agent with $- 100 \times$ (\% time left) when running out of cash.
 
+\newpage
+\begin{lstlisting}[caption={Reward function for DealerMarket-V2, tv-true price, ti-inventory, ii-inital inventory, iv-inital value, tf-funds, i\_f-inital funds, sc-current step and sm-maximum step.},captionpos=b, label=ls:1]
+# if inventory or funds didn't run out
+if( not(self._is_episode_over())):   
+    return -1 * ((self.events.volume_bid==0)*0.005 + (self.events.volume_ask==0)*0.005) * (self.state.offs_bid+self.state.offs_ask)/50
+else: 
+  return (tv*ti-ii*iv)/iv + (tf-i_f)/iv -100*((sm-sc)/sm) #-0.01*10000
+
+\end{lstlisting}
 \subsection{LOBMarket-v1}
+In order to make the experiments a more realistic we also implemented a simplified version of a limit orderbook market. With an orderbook and matching engine. Firstly what the agent observe is a bit different from before. As input the agent get the 10 last frames but now also with the following variables: \textit{stance bid, stance ask, best bid, best ask, the agents best bid and ask, offset of bid and ask,  trades and levels for bid and ask, the agents trades, imbalance volume, imbalance of wealth} and relative wealth. In total 25 scalar statistics. With level we mean the vision width in each direction from the reference price. Where the agent can see $(+20/-20)$ directions. The reward function is slightly changed and varies a bit. As shown in \autoref{ls:2}.
 
-\section{Experiments}
+\begin{lstlisting}[caption={Reward function for LOBMarket-v1},captionpos=b, label=ls:2]
+# if time, inventory or funds didn't run out
+if( not(self._is_episode_over())):
+ return  min(1,max(-1,atvb*((ampb-self.info['price_true'])
+ /self.info['price_true']))) \
+  + min(1,max(-1,atva*((ampa-self.info['price_true'])
+  /self.info['price_true']))) 
+ else: 
+  return ((tv*ti-ii*iv)/iv + (tf-i_f)/iv -5*self.events['went_broke'] -25*((sm-sc-1)/sm))
+\end{lstlisting}
+Finally as outputs, the agent now has ten actions. The same six actions as in DealerMarket-v2, but with four new actions. Where these are either to submit/cancel orders at bid/ask quote prices. The environment flow simulation is the same as before with Poisson arrivals of orders etc.
 
-\subsection{Competitive Self-Play}
+\section{Implementation}
+
+%\subsection{Competitive Self-Play}
 
 \subsection{Neural Network Models}
-The following Neural networks models where used in the different environments, which where found after both hyper-parameter search, and what have been used in previous literature. All the models used are shown on the next page in \autoref{tab:e1}. For \textit{DealerMarket-v1} we trained a 8-layer fully-connected neural network (FCNN) using the DQN agent and Boltzmann policy. With LeakyReLU as activation layer.
+The following Neural networks models where used in the different environments, which where found after both hyper-parameter search, and what have been used in previous literature. All the models used are shown on the next page in \autoref{tab:e1} and figures \autoref{fig:e1} to \autoref{fig:3} For \textit{DealerMarket-v1} we trained a 8-layer fully-connected neural network (FCNN) using the DQN agent and Boltzmann policy. With LeakyReLU as activation layer.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.5]{Imgs/nnadmv1.png}
+    \caption{Neural Network for DealerMarket-V1 using 7 fully connected layers and leaky ReLU as activation function. Input is the observable state variables, which are flattend to be feed into the network.}
+    \label{fig:e1}
+\end{figure}
+For \textit{DealerMarket-v2} we trained a 8-layer fully-connected neural network (FCNN) using the PPO agent and. With LeakyReLU as activation layer.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.5]{Imgs/nna1.png}
+    \caption{Neural Network for DealerMarket-V2 using 7 fully connected layers and leaky ReLU as activation function. Input is the observable state variables, which are flattend to be feed into the network.}
+    \label{fig:e2}
+\end{figure}
+For \textit{LimitOrderMarket-v1} we trained a 8-layer fully-connected neural network (FCNN) using the PPO agent and Boltzmann policy. With LeakyReLU as activation layer.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.5]{Imgs/nna1.png}
+    \caption{Neural Network for LOBMarket-V1 using 7 fully connected layers and leaky ReLU as activation function. Input is the observable state variables, which are flattend to be feed into the network.}
+    \label{fig:e4}
+\end{figure}
 
 \begin{table}[H]
 \centering
-\caption{The different network architectures used in the thesis. Type indicates what type of agent used and policy.}
+\caption{The different network architectures used in the thesis. Type indicates what type of agent used and policy. The random agent is sampling via a uniform distribution different actions.}
 \label{tab:e1}
 \begin{tabular}{llll}
  \textbf{Environment} & \textbf{Architecture}  & \textbf{Type}  & \textbf{Library}  \\ \hline
  \textit{DealerMarket-V1}& 8-layer FCNN  & DQN + Boltzmann  & keras-RL   \\
- \textit{DealerMarket-V2}& ?  & PPO +  & tensorforce  \\
- \textit{DealerMarket-V2}& ?  & PPO + Self Play  & tensorforce  \\
- \textit{DealerMarket-V2} & ?  & Random  & tensorforce \\
- \textit{LOBMarket-V1} & ?  & PPO + Self-Play  & tensorforce \\ 
- \textit{LOBMarket-V1} & ?  & Random +  & tensorforce \\ 
- \textit{LOBMarket-V1} & ?  & Random +  & tensorforce
+ \textit{DealerMarket-V2}& 8-layer FCNN + LSTM  & PPO + $\varepsilon$ - decay  & tensorforce  \\
+ %\textit{DealerMarket-V2}& ?  & PPO + Self Play  & tensorforce  \\
+ \textit{DealerMarket-V2} & Random model  & Random policy  & tensorforce \\
+ %\textit{LOBMarket-V1} & ?  & PPO + Self-Play  & tensorforce \\ 
+ \textit{LOBMarket-V1} & 8-layer FCNN + LSTM  & PPO + $\varepsilon$  & tensorforce \\ 
+ \textit{LOBMarket-V1} & Random model  & Random policy  & tensorforce
 \end{tabular}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{Values of the different hyper-parameters used, that where chosen in the thesis. Learning rate ($\eta$), episodes (eps), memory (mem), policy parameters ($\tau, \varepsilon$)}
+\caption{Values of the different hyper-parameters used, that where chosen in the thesis. Learning rate ($\eta$), episodes (eps), memory (mem), policy parameters ($\tau, \varepsilon$), clipping ($\epsilon$), Generalized Advantage Estimate (GAE) lambda ($\lambda$).}
 \label{tab:e2}
 \begin{tabular}{llll}
  \textbf{Environment} & \textbf{Type} & \textbf{Hyper-parameters} & \textbf{Values}  \\ \hline
- \textit{DealerMarket-V1} & DQN  & [$\eta$, eps, mem, $\tau$] & [$1e^{-5}, 7\cdot10^6, 1\cdot10^5, 0.25$ ]  \\
- \textit{DealerMarket-V2} &  & &   \\
- \textit{DealerMarket-V2} &  & &  \\
- \textit{LOBMarket-V1} &  & &  \\
- \textit{LOBMarket-V1} &  & & 
+ \textit{DealerMarket-V1} & DQN  & [$\eta$, eps, mem, $\tau$] & [$1e^{-5}, 2\cdot10^6, 1\cdot10^5, 0.25$ ]  \\
+ \textit{DealerMarket-V2} & PPO  & [$\eta$, eps, mem, $\epsilon$, $\lambda$] & [$3e^{-4}, 2\cdot10^6, 3.2\cdot10^5$, $0.2$, $0.97$]  \\
+ %\textit{DealerMarket-V2} &  & &  \\
+ \textit{LOBMarket-V1} & PPO  & &  \\
+ %\textit{LOBMarket-V1} &  & & 
 \end{tabular}
 \end{table}
+
+\newpage
 \subsection{Software \& Hardware}
 
 \subsubsection*{OpenAI Gym \& Baselines}
-OpenAI Baselines is a state-of-the-art library used for research and testing of different reinforcement learning algorithms created by \textcite{baselines}. From the library these work uses the following algorithms \textit{DQN, PPO2, HER} and ..
+OpenAI Baselines is a state-of-the-art library used for research and testing of different reinforcement learning algorithms created by \textcite{baselines}. From the library this work has implemented the previous mentioned environments.
 
 \subsubsection*{keras-RL}
-Keras-RL is a library for reinforcment learning. Whihc is developed by \textcite{plappert2016kerasrl} with some state-of-art reinforcement learning algorithms such as: \textit{Deep Q Learning, SARSA} and and Deep Deterministic Policy Gradient. All these implemented in python, with an easy to use interface of keras modular API for building neural networks. This library also works seamless with OpenAI. Which was why it was selected to be used as the primary library for this project. However throughout the project we realized that we needed to work with another more up-to-date library that was more frequently updated. Hence the choice fell on \textit{Tensorforce}.  
+Keras-RL is a library for reinforcment learning. Developed by \textcite{plappert2016kerasrl} with some state-of-art reinforcement learning algorithms such as: \textit{Deep Q Learning, SARSA}. It is an easy to use interface of keras modular API for building neural networks. This library also works seamless with OpenAI. Which was why it was selected to be used as the primary library for this project. However as the project progressed. We realized that we needed to work with another more up-to-date library that was more frequently updated. Hence the choice fell on \textit{Tensorforce}.  
 
 \subsubsection*{Tensorforce}
 Tensorforce developed by \textcite{schaarschmidt2017tensorforce} is another python based reinforcement learning library. Built on top of Tensorflow with a modular API basing parameter using python dictionaries. Some implemented agents in the library that are of interest for this project is \textit{AC3, PPO, DQN} and both a \textit{random} and \textit{constant} agent for sanity checks \parencite{schaarschmidt2017tensorforce}.
@@ -886,23 +1064,82 @@ In order to understand what the agents are doing. Some visualization has been em
 Secondly during training we save an info object containing bid and ask prices, volumes, inventory, value of the asset, cash and the difference in these. Which are later used for evaluation. However we do visualize these in order to understand how e.g. the bid-ask spread is evolving during training. These visualizations are all done in R reading the training history or callbacks saved in JSON files. Where both dplyr \parencite{dplyr} and ggplot2 \parencite{ggfplot2} are used for this purpose.
 
 \section{Evaluation}
+A common approach in machine learning to evaluate models is to use k-fold cross-validation often with $k=10$. However in this thesis all data that is generated is from each completed simulation. We cannot divided it into test or training set. Therefore we look at other different metrics gathered after each simulation. In order to evaluate the agent. These are discussed below. To account for randomness, we run each simulation with three random seeds. 
 
-\chapter{Results}
+\begin{itemize}
+\item \textit{Price Impact Regression}. We estimate Kyle's lambda ($\lambda$) i.e. the price impact of the agents orders via regression. Where a larger $\lambda$ implies a that volumes have a larger price impact on prices.
 
+\item \textit{Visualizing learning \& Strategies}. We look at how the agents act together with the price data stored from each run. To see if some of the strategies mentioned in \autoref{ch:2} are shown. 
+    
+\item \textit{Spreads \& Inventory}. We look at how the spreads \& inventory are changing during training. If the spreads decline over time, the correlation between spread and inventory etc.
+
+\item \textit{Net PnL (Net Profit and Loss)}. We look at the Net PnL of the agent to see if the market maker in fact has learned to make a profit or not. Thus optimizing its inventory levels. 
+
+\item \textit{Compare agents price to VWAMP \& Random policy}. We use VVAMP and the random agent as benchmarks to see if the agent on average is better or not. During each simulation.
+
+\item \textit{Stylized facts of simulated data}
+We also look for some of the stylized facts mentioned in \autoref{ch:2} to see how close or far away from reality our simulations are.
+
+%really use this?
+\item \textit{Sharpe ratio}. Another benchmark to see how well the agent is learning is looking at the Sharpe ratio:
+
+\begin{equation}
+    \label{eq:s}
+    S_N = \sqrt{N} \frac{E(r-r_{f})}{\sqrt{Var(r-r_{f})}}
+\end{equation}
+\end{itemize}
+Where $r$ is the cash return compared to the agents initial cash, $r_f$ is the risk-free rate and  $N$ is what period it is to the annualized Sharpe ratio.
+
+\chapter{Results}\label{ch:6}
+In this section the results from the different experiments and environments is presented. In the form of tables and graphs. We start with some stylized facts about our simulated data. Thereafter we continue with a breakdown of different statistic over run metrics for each environment.   
+
+\section{Stylized Facts of Data}
+
+\subsection*{DealerMarket-V2}
+
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+		\centering
+		%The code to input the plot is extremely simple
+		%\input{Imgs/hist_train_sf_dmv1.tex}
+		\includegraphics[scale=.5]{dmv1_sf_multi.png}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Some stylized facts for DealerMarket-V2. A signature plot (A), periodicity in mid prices (B), empirical distribution of returns (C) and an acf over price changes (D). }
+		\label{fig:sf1}
+\end{figure}
+In \autoref{fig:sf1} we can see by looking at the graphs that the prices exhibits a .. behaviour. This is inline with what the literature says.
+
+\newpage
+
+\subsection*{LOBMarket-V1}
+
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+		\centering
+		%The code to input the plot is extremely simple
+		%\input{Imgs/hist_train_sf_dmv1.tex}
+		\includegraphics[scale=.5]{lobv1_sf_multi.png}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Some stylized facts for LOBMarket-V1. A signature plot (A), periodicity in mid prices (B), empirical distribution of returns (C) and an acf over price changes (D). }
+		\label{fig:sf2}
+\end{figure}
+In \autoref{fig:sf2} we can see by looking at the graphs that the prices exhibits a .. behaviour. This is inline with what the literature says
+
+\newpage
 \section{DealerMarket-v1}
 
 \subsection*{Accumulated Reward}
 
-\begin{figure}[H]
+%\begin{figure}[H]
 		%Do not try to scale figure in .tex or you loose font size consistency
-	    	\centering
+%	    	\centering
 		%The code to input the plot is extremely simple
-		\input{Imgs/hist_rwd_d1.tex}
+%		\input{Imgs/hist_rwd_dmv1.tex}
 		%Captions and Labels can be used since this is a figure environment
-		\caption{Histogram over accumulated reward for DealerMarket-V0 agent. After testing trained model on environment for 500 simulations of 1000 steps each. Red vertical line is mean reward over all experiments. }
-		\label{fig:dm1}
-\end{figure}
-
+%		\caption{Histogram over accumulated reward for DealerMarket-V0 agent. After testing trained model on environment for 500 simulations of 1000 steps each. Red vertical line is mean reward over all experiments. }
+%		\label{fig:dm1}
+%\end{figure}
+Looking at \autoref{tab:dm1} below we can see that the accumulated reward is fairly consistent. Compared to the other environments, presented later. Also note that the reward schemes are somewhat different between the different environments as discussed previously. Which will obviously effect the distribution of the accumulated rewards. This environment is easier to navigate in for the agent. With less volatility and arrivals of orders. 
 % latex table generated in R 3.3.1 by xtable 1.8-2 package
 % Fri May 18 00:04:06 2018
 \begin{table}[H]
@@ -911,11 +1148,34 @@ Secondly during training we save an info object containing bid and ask prices, v
   \hline
  \textbf{Model} & \textbf{MeanRwd} & \textbf{StdRwd} & \textbf{MaxRwd} & \textbf{MinRwd} & \textbf{CI} \\ 
   \hline
-DealerMarket-V0 & 484.49 & 1.68 & 490.29 & 478.67 & 0.12 \\ 
+DealerMarket-V1 & 391.88 & 150.47 & 478.04 & -9.43 & 16.18 \\
    \hline
 \end{tabular}
+\caption{Table over rewards for DealerMarket-v1 after training for $2\cdot10^6$ steps}
 \label{tab:dm1}
-\caption{Table over reward after in total $10^6$ steps}
+\end{table}
+
+Used mainly as a benchmark to see that the agent is able to learn something. However it still takes some time to train until the agent learns not to go bankrupt. As can be seen by .. the mean standard deviation of the reward is quite large. This is due to the randomness associated with training reinforcement learning agents. Nevertheless calculating confidence intervals for the reward we see that the average reward is close to 400 ($391.81 \pm 16.18$).
+
+\subsection*{Price Impact Regression}
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Mon Jul 02 23:12:15 2018
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & Estimate & Std. Error & t value & Pr($>$$|$t$|$) & $R^{2} $ & AIC  \\ 
+ 
+  \hline
+(Intercept) & 0.0512 & 0.0510 & 1.00 & 0.3178 & - & - \\ 
+  mu & 0.0005 & 0.0003 & 1.89 & 0.0611 & - & - \\ 
+  dI & 0.0000 & 0.0000 & 0.86 & 0.3909 & - & - \\ 
+  dInit & 0.0000 & 0.0000 & 1.75 & 0.0835 & - & - \\ 
+  sqrt(d\_inv) & -0.0396 & 0.2410 & -0.16 & 0.8696 & - & - \\ 
+   \hline
+\end{tabular}
+\caption{Results from running price impact regression on the change in mid prices during the simulations. Where Kyle's $\lambda \approx 0.005$.}
+\label{tab:pi1}
 \end{table}
 
 \subsection*{Q-value function, episode reward \& loss}
@@ -930,70 +1190,311 @@ DealerMarket-V0 & 484.49 & 1.68 & 490.29 & 478.67 & 0.12 \\
 \end{figure}
 In \autoref{fig:dm11} the complete history from training the market-maker agent is shown. We can see that the optimal Q-value (action-value function) stagnates quite quickly..
 
-\subsection*{Bid-Ask Spread, Inventory \& Stuff}
+\subsection*{Bid-Ask Spread \& Inventory}
 \begin{figure}[H]
 		%Do not try to scale figure in .tex or you loose font size consistency
 	    	\centering
 		%The code to input the plot is extremely simple
-		\input{Imgs/hist_train_spreads_v2.tex}
+		%\input{Imgs/hist_train_basp_inv_dmv0.tex}
+		\includegraphics[scale=0.5]{dmv0_basp_inv_multi.png}
 		%Captions and Labels can be used since this is a figure environment
-		\caption{Plots showing how the bid-ask price and bid-ask spread has evolved during training of the agent. This also compared to the mid price. First plot is the different between the bid and ask price. Second plot is the spread i.e. the difference between tha ask and bid prices.}
+		\caption{Plots showing how the bid-ask spread(A), inventory (B), percentage change in spread (c) as well as bid-ask volumes (D). Evolves during training. }
 		\label{fig:dm12}
 \end{figure}
-In \autoref{fig:dm12} the bid-ask spread is presented. As can be seen from the figure ...
+In \autoref{fig:dm12} changes in the bid-ask spread and inventory is presented. As can be seen from the figure ...
+
+%\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+%	    	\centering
+		%The code to input the plot is extremely simple
+%		\input{Imgs/hist_train_inv_vols_dmv1.tex}
+		%Captions and Labels can be used since this is a figure environment
+%		\caption{First plot showing how the market maker agents inventory is chaining compared the initial inventory which is stochastic. Second plot showing how the bid and ask volumes are evolving,  throughout all the simulations.}
+%		\label{fig:dm13}
+%\end{figure}
+
+
+%\subsection*{Correlation between inventory and prices}
+
+%\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+%	    	\centering
+		%The code to input the plot is extremely simple
+%		\input{Imgs/hist_train_price_inv_dmv1.tex}
+		%Captions and Labels can be used since this is a figure environment
+%		\caption{Plot over correlation between mid, bid and ask price against the inventory.}
+%		\label{fig:dm14}
+%\end{figure}
+
+
+\subsection*{Visualization of agents states \& actions}
 
 \begin{figure}[H]
-		%Do not try to scale figure in .tex or you loose font size consistency
-	    	\centering
-		%The code to input the plot is extremely simple
-		\input{Imgs/hist_train_inv_vols.tex}
-		%Captions and Labels can be used since this is a figure environment
-		\caption{First plot showing how the market maker agents inventory is chaining compared the initial inventory which is stochastic. Second plot showing how the bid and ask volumes are evolving,  throughout all the simulations.}
-		\label{fig:dm13}
-\end{figure}
-
-In \autoref{fig:dm13} we see how the inventory and bid-ask volumes are chancing. This is interesting to look at as.. indicates something something
-
-\subsection*{Correlation between inventory and prices}
-
-\begin{figure}[H]
-		%Do not try to scale figure in .tex or you loose font size consistency
-	    	\centering
-		%The code to input the plot is extremely simple
-		\input{Imgs/hist_train_price_inv.tex}
-		%Captions and Labels can be used since this is a figure environment
-		\caption{Plot over correlation between mid, bid and ask price against the inventory.}
-		\label{fig:dm14}
+\centering
+\subfloat[][Agents actions after after 84 episodes. Where agent losses quite frequently.]{
+\includegraphics[width=0.5\textwidth]{best_84eps.jpg}
+\label{fig:sv1}}
+\subfloat[][Agents actions after after 462 episodes. Agent is slowly starting to learn not to go bust.]{
+\includegraphics[width=0.5\textwidth]{best_462eps.jpg}
+\label{fig:sv2}}
+\qquad
+\subfloat[][Agents actions after after 1169 episodes. Agent hasn't learned not to go bust and makes a small profit.]{
+\includegraphics[width=0.5\textwidth]{best_1169eps.jpg}
+\label{fig:sv3}}
+\subfloat[][Agents actions after after 2006 episodes.  Agent is balancing quotes and make profits frequently.]{
+\includegraphics[width=0.5\textwidth]{best_2006eps.jpg}
+\label{fig:sv4}}
+\caption{Change in agents behaviour during training for DealerMarket-v1.}
+\label{fig:viz1}
 \end{figure}
 
 \section{DealerMarket-v2}
 
 \subsection*{Accumulated Reward}
 
+%\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+%	    	\centering
+		%The code to input the plot is extremely simple
+%		\input{Imgs/hist_rwd_dmv2.tex}
+		%Captions and Labels can be used since this is a figure environment
+%		\caption{Histogram over accumulated reward for DealerMarket-V2 agent during training. Red vertical line is mean reward over all experiments. }
+%		\label{fig:dm2}
+%\end{figure}
+
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Fri May 18 00:04:06 2018
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+ \textbf{Model} & \textbf{MeanRwd} & \textbf{StdRwd} & \textbf{MaxRwd} & \textbf{MinRwd} & \textbf{CI} \\ 
+  \hline
+DealerMarket-V2 & 22.47 & 78.46 & 347.40 & -816.11 & 2.85  \\
+   \hline
+\end{tabular}
+\caption{Table over rewards for DealerMarket-V2 after training for $2\cdot10^6$ steps}
+\label{tab:dm2}
+\end{table}
+
+In \autoref{tab:dm2} the mean reward over all episodes and time-steps is presented. On average the agent do make a reward of close to 22 $(22.47 \pm 2.85)$. Note also that the reward is much smaller for this environment compared to the DealerMarket-V1 environment. Mostly likely due to the complexity of the DealerMarket-v2 environment. With higher volatility in the underlying prices of the asset and changed reward function. Explaining the quite wide fluctuation between min and max values of the reward.
+\newline
+\newline
+Looking at \autoref{tab:pi2} below we can see that due to higher volatility in the DealerMarket-V2 environment the price impact seems to increase. This as Kyle's $\lambda \approx 0.11$ now. Compared to $\lambda \approx 0.005$ for DealerMarket-V1. Using the square root of the change in inventory per episode, yielded a higher $R^{2}$ and a lower AIC value. Indicating a better model for the regression.
+
+\subsection*{Price Impact Regression}
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Mon Jul 02 23:12:15 2018
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & Estimate & Std. Error & t value & Pr($>$$|$t$|$)\\ 
+ 
+  \hline
+(Intercept) & -50.3085 & 45.4755 & -1.11 & 0.2733 \\ 
+  mu & 0.1097 & 0.0820 & 1.34 & 0.1865  \\ 
+  dI & -0.3174 & 0.0776 & -4.09 & 0.0001 \\ 
+  dInit & 0.0301 & 0.1006 & 0.30 & 0.7658 \\ 
+  sqrt(d\_inv) & -7.4158 & 133.4904 & -0.06 & 0.9559  \\ 
+   \hline
+\end{tabular}
+\caption{Results from running price impact regression on the change in mid prices during the simulations. Where Kyle's $\lambda \approx 0.11$. With $R^{2}= 0.3439$ \& $AIC =  814.556$.}
+\label{tab:pi2}
+\end{table}
+
+\subsection*{Episode reward, Policy Gradients \& loss}
 \begin{figure}[H]
 		%Do not try to scale figure in .tex or you loose font size consistency
 	    	\centering
 		%The code to input the plot is extremely simple
-		\input{Imgs/hist_rwd_d1.tex}
+		\input{Imgs/hist_train_rwd_bench.tex}
 		%Captions and Labels can be used since this is a figure environment
-		\caption{Histogram over accumulated reward for DealerMarket-V0 agent. After testing trained model on environment for 1000 simulations of 1000 steps each. Red vertical line is mean reward over all experiments. }
-		\label{fig:dm2}
+		\caption{Plot showing the average reward after  during $2\cdot 10^{6}$ time-steps. Average is taken after 10 000 time steps, compared to a random agent on the same environment.}
+		\label{fig:dm21}
+\end{figure}
+In \autoref{fig:dm21} the mean reward for both the agent and a random policy on the environment is shown. The mean is taken after each episode, i.e. after some 10 000 time-steps. We can clearly see in the graph that the agents is worse than a random policy in the beginning of the training. But slowly learns a more optimal behaviour. After some 75 000 time-steps the agent starts to outperform the random policy quite consistently. Compared to DealerMarket-V1, the mean reward seems to converge more smoothly using the PPO algorithm. Which is expected as policy gradient methods, tend to converge more easily.
+\subsection*{Bid-Ask Spread \& Inventory}
+\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+	    	\centering
+		%The code to input the plot is extremely simple
+		%\input{Imgs/hist_train_spreads_dmv2.tex}
+		\includegraphics[scale=0.5]{dmv2_basp_inv_multi.png}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Plots showing how the bid-ask spread(A), inventory (B), percentage change in spread (c) as well as bid-ask volumes (D). Evolves during training.}
+		\label{fig:dm22}
+\end{figure}
+In \autoref{fig:dm22} the bid-ask spread and inventory changes are presented. As can be seen from the figure ...
+
+%\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+%	    	\centering
+		%The code to input the plot is extremely simple
+%		\input{Imgs/hist_train_inv_vols_dmv2.tex}
+		%Captions and Labels can be used since this is a figure environment
+%		\caption{First plot showing how the market maker agents inventory is chaining compared the initial inventory which is stochastic. Second plot showing how the bid and ask volumes are evolving,  throughout all the simulations.}
+%		\label{fig:dm23}
+%\end{figure}
+
+\subsection*{Profit \& Loss}
+
+\begin{figure}[H]
+    \centering
+    \input{Imgs/hist_train_pnl_dmv1.tex}
+    \caption{Net Profit \& Loss (PnL) (A) accumulated PnL (B) for and (C) percentage PnL agent during training.}
+    \label{fig:pnl1}
+\end{figure}
+In \autoref{fig:pnl1} we can see the agent's profit and loss (P\&L) per episode. One can notice that it takes some time until the agent actually learns not to go bankrupt. Around 1 million time steps seems is needed.
+
+%\subsection*{Correlation between inventory and prices}
+
+%\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+%	    	\centering
+		%The code to input the plot is extremely simple
+%		\input{Imgs/hist_train_price_inv_dmv2.tex}
+		%Captions and Labels can be used since this is a figure environment
+%		\caption{Plot over correlation between mid, bid and ask price against the inventory.}
+%		\label{fig:dm24}
+%\end{figure}
+
+\subsection*{Visualization of agents states \& actions}
+
+\begin{figure}[H]
+\centering
+\subfloat[][Agents actions after after 84 episodes. Where agent losses quite frequently.]{
+\includegraphics[width=0.5\textwidth]{best_84eps.jpg}
+\label{fig:svd1}}
+\subfloat[][Agents actions after after 462 episodes. Agent is slowly starting to learn not to go bust.]{
+\includegraphics[width=0.5\textwidth]{best_462eps.jpg}
+\label{fig:svd2}}
+\qquad
+\subfloat[][Agents actions after after 1169 episodes. Agent hasn't learned not to go bust and makes a small profit.]{
+\includegraphics[width=0.5\textwidth]{best_1169eps.jpg}
+\label{fig:svd3}}
+\subfloat[][Agents actions after after 2006 episodes.  Agent is balancing quotes and make profits frequently.]{
+\includegraphics[width=0.5\textwidth]{best_2006eps.jpg}
+\label{fig:svd4}}
+\caption{Change in agents behaviour during training for DealerMarket-v2.}
+\label{fig:vizd1}
 \end{figure}
 
 \section{LOBMarket-v1}
 
 \subsection*{Accumulated Reward}
 
+%\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+%	    	\centering
+		%The code to input the plot is extremely simple
+%		\input{Imgs/hist_rwd_d1.tex}
+		%Captions and Labels can be used since this is a figure environment
+%		\caption{Histogram over accumulated reward for LOBMarket-V1 agent. After testing trained model on environment for 1000 simulations of 1000 steps each. Red vertical line is mean reward over all experiments. }
+%		\label{fig:dm3}
+%\end{figure}
+
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Fri May 18 00:04:06 2018
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+ \textbf{Model} & \textbf{MeanRwd} & \textbf{StdRwd} & \textbf{MaxRwd} & \textbf{MinRwd} & \textbf{CI} \\ 
+  \hline
+LOBrMarket-V1 & -4.06 & 11.64 & 12.34 & -202.75 & 0.46 \\
+   \hline
+\end{tabular}
+\label{tab:dm3}
+\caption{Table over rewards for the LOBMarket-V1 after training for $2\cdot10^6$ steps}
+\end{table}
+
+\subsection*{Price Impact Regression}
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Mon Jul 02 23:12:15 2018
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & Estimate & Std. Error & t value & Pr($>$$|$t$|$) & $R^{2} $ & AIC  \\ 
+ 
+  \hline
+(Intercept) & -50.3085 & 45.4755 & -1.11 & 0.2733 & - & - \\ 
+  mu & 0.1097 & 0.0820 & 1.34 & 0.1865 & 0.3439 & 814.556 \\ 
+  dI & -0.3174 & 0.0776 & -4.09 & 0.0001 & - & - \\ 
+  dInit & 0.0301 & 0.1006 & 0.30 & 0.7658 & - & - \\ 
+  sqrt(d\_inv) & -7.4158 & 133.4904 & -0.06 & 0.9559 & - & - \\ 
+   \hline
+\end{tabular}
+\label{tab:pi3}
+\caption{Results from running price impact regression on the change in mid prices during the simulations. Where Kyle's $\lambda \approx 0.11$.}
+\end{table}
+
+\subsection*{Bid-Ask Spread, Inventory \& Stuff}
 \begin{figure}[H]
 		%Do not try to scale figure in .tex or you loose font size consistency
 	    	\centering
 		%The code to input the plot is extremely simple
-		\input{Imgs/hist_rwd_d1.tex}
+		%\input{Imgs/hist_train_spread_dmv1.tex}
+		\includegraphics[scale=.5]{lob1_baps_inv_multi.png}
 		%Captions and Labels can be used since this is a figure environment
-		\caption{Histogram over accumulated reward for DealerMarket-V0 agent. After testing trained model on environment for 1000 simulations of 1000 steps each. Red vertical line is mean reward over all experiments. }
-		\label{fig:dm3}
+		\caption{Plots showing how the bid-ask price and bid-ask spread has evolved during training of the agent. This also compared to the mid price. First plot is the different between the bid and ask price. Second plot is the spread i.e. the difference between tha ask and bid prices.}
+		\label{fig:dm32}
 \end{figure}
+In \autoref{fig:dm32} the bid-ask spread is presented. As can be seen from the figure ...
 
+%\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+%	    	\centering
+		%The code to input the plot is extremely simple
+%		\input{Imgs/hist_train_inv_dmv1.tex}
+		%Captions and Labels can be used since this is a figure environment
+%		\caption{First plot showing how the market maker agents inventory is chaining compared the initial inventory which is stochastic. Second plot showing how the bid and ask volumes are evolving,  throughout all the simulations.}
+%		\label{fig:dm33}
+%\end{figure}
+
+\subsection*{Profit \& Loss}
+
+\begin{figure}[H]
+    \centering
+    \input{Imgs/hist_train_pnl_lob1.tex}
+    \caption{Net Profit \& Loss (A) and accumulated profit and loss (B) for agent during training.}
+    \label{fig:pnl2}
+\end{figure}
+In \autoref{fig:pnl2} we can see both the agent's profit and loss (P\&L) and accumulated P\&L per episode. Firstly one can notice that it takes some time until the agent actually learns not to go bankrupt. Around 1 million time steps seems to be needed. Also note the quite large increase to positive P\&L from around episode 850 to around episode 1400. 
+
+%\subsection*{Correlation between inventory and prices}
+
+%\begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+%	    	\centering
+		%The code to input the plot is extremely simple
+%		\input{Imgs/hist_train_price_inv_dmv1.tex}
+		%Captions and Labels can be used since this is a figure environment
+%		\caption{Plot over correlation between mid, bid and ask price against the inventory.}
+%		\label{fig:dm34}
+%\end{figure}
+
+\subsection*{Visualization of agents states \& actions}
+
+\begin{figure}[H]
+\centering
+\subfloat[][Agents actions after after 84 episodes. Where agent losses quite frequently.]{
+\includegraphics[width=0.5\textwidth]{LOBMarket_eps1_lstm.jpg}
+\label{fig:svl1}}
+\subfloat[][Agents actions after after 462 episodes. Agent is slowly starting to learn not to go bust.]{
+\includegraphics[width=0.5\textwidth]{LOBMarket_eps1_lstm.jpg}
+\label{fig:svl2}}
+\qquad
+\subfloat[][Agents actions after after 1169 episodes. Agent hasn't learned not to go bust and makes a small profit.]{
+\includegraphics[width=0.5\textwidth]{LOBMarket_eps1_lstm.jpg}
+\label{fig:svl3}}
+\subfloat[][Agents actions after after 2006 episodes.  Agent is balancing quotes and make profits frequently.]{
+\includegraphics[width=0.5\textwidth]{LOBMarket_eps1_lstm.jpg}
+\label{fig:svl4}}
+\caption{Change in agents behaviour during training for LOBMarket-v1.}
+\label{fig:vizl1}
+\end{figure}
 
 
 
@@ -1004,7 +1505,36 @@ In \autoref{fig:dm13} we see how the inventory and bid-ask volumes are chancing.
 %    \label{fig:dm1}
 %\end{figure}
 
-\chapter{Discussion \& Conclusions}
+\chapter{Discussion \& Conclusions}\label{ch:7}
+
+\section{Discussions}
+
+\subsection{Stylized Facts}
+Statistical properties of stock returns has been study for ages. In order to make sure that this studies simulated data is as realistic as possible, we look at some of the stylized facts mentioned in \autoref{ch:2}. \textit{Firstly} looking at the signature plots for DealerMarket-v2 and LOBMarket-v1 we clearly see a \textit{mean-reverting} behaviour of the sampled volatility in prices changes. These graphs do exhibit some flatness, indicating that the we have weak mean reversion as mentioned in \parencite{bouchaud2018trades}.
+\newline
+\newline
+\textit{Secondly} looking at the changes in the mid prices during our simulations, we see as indicated by \textcite{bouchaud2018trades} some \textit{activity clustering}. This clustering behaviour shows that the mid price is followed by different periods of a lot of changes in the mid price. Both positive and negative. \textit{Finally} as mentioned in \parencite{cont2001empirical} looking at the ACF for the prices changes. We see that there seems to be a absence of autocorrelations. However if we would have presented the results per time-step (would correspond to intraday periods) instead, we might have seen these. Also as suggested by \textcite{cont2001empirical}. Nevertheless, we conclude that the simulated data is realistic.
+
+\subsection*{DealerMarket-v1}
+We used DealerMarket-v1 as the basis for our first inital experiments. Nevertheless, even if this is the most simple environment. There are some interesting phenomena that can be observed. \textit{Firstly} looking at the mean reward of the agent, on average the agent makes a profit of $391.88 \pm 16.18$. This indicates that the agents is better than a random policy and is in fact learning something about its world.
+\newline
+\newline
+\textit{Secondly} looking at the price impact of the single agent on the simulated market. We have an estimate of $\lambda \approx 0.005$ indicating as according to \parencite{cartea2015algorithmic} that the market is liquid. Thus the agent has a low price impact. Mainly due to a lower $\sigma$ compared to the other environments. As we haven't introduced any competition. \textit{Thirdly} regarding the optimality of the strategy employed by the agent. The Q-function seems to stagnate after some 25 000 time-steps at $5$ with a $95\%$ confidence. Indicating that the agent finds a optimal policy quite fast during training.
+\newline
+\newline
+Continuing with looking at the episode reward it seems to fluctuate a bit. This can be due to randomness in training the agent. However repeating the same experiment with different random seeds, the average reward were more or less the same. \textit{Fourthly} looking at the spreads in \autoref{fig:dm12} we see that spread is decreasing throughout training. Which corresponds too what is stated in for instance  in \parencite{foucault2013market}. Ignoring the adverse selection component and order-processing cost of the spread. 
+\newline
+\newline
+The reason for this, is mostly due to the \textit{inventory control cost component} of the spread. \textit{Fifthly} an interesting question to pose looking at the changes in the spread and inventory is what would a real life market maker do? Looking in figure \autoref{fig:dm12} at around 100 episodes we can see that the agents inventory is decreasing (plot D). At the same time the spread is starting to increase (plot C) and bid and ask volumes are also increasing. Looking at \autoref{tab:h1} this tactics of increasing, bid price, bid volume or ask price. Seems to correspond with the idea of that the agent's inventory is to low. Our that the dealer wants to encourage his clients to sell. \textit{Finally} looking at the visualization of the agents states in \autoref{fig:viz1} we can see ....
+
+\subsection*{DealerMarket-v2}
+
+
+\subsection*{LOBMarket-v1}
+
+\section{Conclusions}
+
+\section{Future work}
 
 \printbibliography[heading=bibintoc] % Print the bibliography (and make it appear in the table of contents)
 
@@ -1184,4 +1714,26 @@ The first term of \autoref{eq:a13h} is the spread which maximizes the expected r
     \item The spread can be decomposed into a risk neutral spread plus an adjustment for uncertainty
     \item The spread is independent of inventory level.
 \end{enumerate}
+
+%not sure if this section is necessary yet
+\section{What human dealers would do}
+Dealer or market makers are profit-motivated trader who allow other traders to trade when they want to trade \parencite{harris2003trading}. As mentioned before one way of finding optimal bid-and ask quotes for inventory control is to use the \textcite{ho1981optimal} model. However, what would a human trader do reacting to different conditions on the market? In \textcite{harris2003trading} this is presented, shown below in \autoref{tab:h1}:
+
+\begin{table}[H]
+\begin{tabular}{lll}
+\hline
+ \textbf{Condition} & \textbf{Tactics}  & \textbf{Purpose}  \\ \hline
+ \shortstack{Inventories are too low \\ or clients are net buyers}  & \shortstack{Raise bid price \\ Increase bid size}  & \shortstack{Encourage clients to sell}  \\
+ & \shortstack{Raise ask price \\decrease ask size }  & \shortstack{Discourage clients from buying}  \\
+ %& \shortstack{} &  \shortstack{} \\
+  %& \shortstack{} &  \shortstack{} \\
+ \shortstack{ Inventories are to high \\ or clients are net sellers} & \shortstack{Lower ask price \\ Increase ask size}  & \shortstack{Encourages clients to buy}  \\
+ & \shortstack{Lower ask price \\ Increase ask size}  & \shortstack{Discourage clients from selling}  \\
+ %& \shortstack{} &  \shortstack{} \\
+  %& \shortstack{} &  \shortstack{} \\
+ &  &  \\ \hline
+\end{tabular}
+\caption{Tactics Dealers or Market Makers Use to Manage Their Inventories and Orders Flow. Adopted from \parencite{harris2003trading} }
+\label{tab:h1}
+\end{table}
 \end{document}
