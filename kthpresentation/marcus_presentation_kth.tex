@@ -1,0 +1,669 @@
+\documentclass[aspectratio=1610]{beamer}
+
+\usetheme{KTH}
+
+% remove this if using XeLaTeX or LuaLaTeX
+\usepackage[utf8]{inputenc}
+\usepackage{graphics}
+\usepackage{datetime} %get today's date
+\usepackage{biblatex}
+\usepackage{amsmath,float}
+\usepackage{amssymb}
+\addbibresource{references.bib}
+\usepackage{media9}
+\usepackage{caption}
+\captionsetup[figure]{font=small}
+
+\setbeamertemplate{caption}[numbered] %figure numbering
+\graphicspath{{Imgs/}}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+  \vspace{0.02\textheight}
+  
+  \begin{Large}
+    Simulating Market Maker behaviour using Deep Reinforcement Learning to understand Market Microstructure
+  \end{Large}
+  
+  \begin{small}
+  Master thesis presentation in M.s.c. in Machine Learning, DA225X
+  \newline
+  \today
+  
+  \end{small}
+  
+
+  \vspace{0.1\textheight}
+
+  \begin{small}
+    \textit{Marcus Elwin}, \href{mailto:elwi@kth.se}{elwi@kth.se}
+  \end{small}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usebackgroundtemplate{\vbox{\null\vspace{3mm}
+  \hspace{3mm}\pgfuseimage{kthlogosmall}\par
+  \vspace{72mm}\hbox{\hspace{-75mm}\pgfuseimage{kthplatta}}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Contents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\addtobeamertemplate{navigation symbols}{}{ \hspace{1em}    \usebeamerfont{footline}%
+    \insertframenumber / \inserttotalframenumber }
+
+\AtBeginSection[]
+
+\begin{frame}
+  \frametitle{\hfill Table of Contents}
+
+  \tableofcontents[subsectionstyle=hide]
+
+\end{frame}
+
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Introduction to problem etc
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{\hfill Introduction}
+  
+ \begin{columns}[t]
+    \column{.4\textwidth}
+    \begin{block}{Problem definition}
+    \begin{small}
+    \begin{itemize}
+        \item Financial markets are harder to understand due to: \alert{Fragmentation}, \alert{High Frequency} and \alert{Algorithmic Trading}.
+        \item Previous empirical models are faulty or insufficient \parencite{o2015high}.
+        \item Need for new more capable methods to simulate and describe Financial Markets 
+        \end{itemize}
+    \end{small}
+    \end{block}
+    \column{.4\textwidth}
+    \begin{block}{Objective}
+    \begin{small}
+    \begin{itemize}
+        \item Apply Reinforcement Learning to more complex domain as financial market
+        \item Provide new insights to the field of market microstructure
+        \item Create functioning exchange simulator (EXSIM)
+        \end{itemize}
+    \end{small}
+    \end{block}
+    \column{.4\textwidth}
+    \begin{block}{Research Question}
+    \begin{small}
+     \begin{itemize}
+        \item Will trading dynamics such as \alert{bid-ask spread clustering}, \alert{optimal inventory handling}.
+        \item  Be exhibited \& learned by \alert{Reinforcement Learning} agents on a simulated Nordic stock market.
+        \end{itemize}
+    \end{small}
+    \end{block}
+\end{columns}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Background Reinforcement learning + Market Microstructure
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Market Microstructure}
+
+%market microstructure
+\begin{frame}
+  \frametitle{\hfill Market Microstructure}
+  \textit{"Market microstructure is the study of exchanging assets under implicit trading rules"} \parencite{madhavan2000market, o1995market}.
+  
+  \begin{columns}[t]
+    \column{.5\textwidth}
+    \begin{block}{Market Participants}
+        \begin{itemize}
+        \item \textbf{Fundamental Traders}
+        \item \textbf{Informed Traders}
+        \item \textbf{Market Makers}
+        \end{itemize}
+    \end{block}
+    \column{.5\textwidth}
+    \begin{block}{Trading Mechanisms}
+        \begin{itemize}
+        \item \textbf{Dealer Markets}
+        \item \textbf{Limit Order Markets}
+        \end{itemize}
+    \end{block}
+\end{columns}
+
+\begin{columns}[t]
+    \column{.5\textwidth}
+    \begin{block}{Price Formation}
+        \begin{itemize}
+        \item \textbf{Bid-ask spread}
+        \item \textbf{Order Imbalance \& Price Impact}
+        
+        \end{itemize}
+    \end{block}
+    \column{.5\textwidth}
+    \begin{block}{Optimal Inventory}
+        \begin{itemize}
+        \item \textbf{Inventory based models} as \textcite{ho1981optimal}
+        \end{itemize}
+    \end{block}
+\end{columns}
+  
+\end{frame}
+
+\subsection{Market Participants}
+
+\begin{frame}
+  \frametitle{\hfill Market Makers}
+  Dealers or \textit{Market Makers} are \alert{profit} motivated traders who allow other traders to trade when they want to trade \parencite{harris2003trading}.
+  
+  \begin{table}[H]
+\begin{tabular}{lll}
+\hline
+ \textbf{Condition} & \textbf{Tactics}  & \textbf{Purpose}  \\ \hline
+ \shortstack{Inventories are too low \\ or clients are net buyers}  & \shortstack{Raise bid price \\ Increase bid size}  & \shortstack{Encourage clients to sell}  \\
+ & \shortstack{Raise ask price \\decrease ask size }  & \shortstack{Discourage clients from buying}  \\
+ %& \shortstack{} &  \shortstack{} \\
+  %& \shortstack{} &  \shortstack{} \\
+ \shortstack{ Inventories are to high \\ or clients are net sellers} & \shortstack{Lower ask price \\ Increase ask size}  & \shortstack{Encourages clients to buy}  \\
+ & \shortstack{Lower ask price \\ Increase ask size}  & \shortstack{Discourage clients from selling}  \\
+ %& \shortstack{} &  \shortstack{} \\
+  %& \shortstack{} &  \shortstack{} \\
+ &  &  \\ \hline
+\end{tabular}
+\caption{Tactics Dealers or Market Makers Use to Manage Their Inventories and Orders Flow. Adopted from \parencite{harris2003trading} }
+\label{tab:h1}
+\end{table}
+
+
+\end{frame}
+
+%\subsection{Trading Mechanisms}
+
+%\begin{frame}
+%  \frametitle{\hfill Trading Mechanisms}
+  
+%  \begin{columns}[t]
+%    \column{.4\textwidth}
+%    \begin{block}{Dealer Market}
+%    \begin{itemize}
+%        \item Point 1
+%    \end{itemize}
+%    \end{block}
+    
+%    \column{.4\textwidth}
+%    \begin{block}{Limit order-market (LOB)}
+%    \begin{itemize}
+%        \item  
+%        \textit{Limit orders} makes a LOB very dynamic:
+%        \begin{equation}
+%        x = (\varepsilon_{x}, p_{x}, v_{x}, t_{x})   
+%        \end{equation}
+%        \item Tick size ($v_{0}$) and lot size ($\vartheta$) \alert{important}
+%        \item  Different type of orders: \textit{hidden, ice-burg, fill-or-kill etcetera.}
+%    \end{itemize}
+%    \end{block}
+%\end{columns}
+%
+%\end{frame}
+
+\begin{frame}{}
+\frametitle{\hfill Example Limit Order book}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[scale=.60]{LOBex.PNG}
+    \caption{Snapshot of the LOB Source: \parencite{cartea2015algorithmic}}
+    \label{fig:1}
+\end{figure}
+\end{frame}
+
+\subsection{Price Formation}
+
+\begin{frame}
+  \frametitle{\hfill Price Formation}
+  Executing orders might have an impact on the remaining prices..
+  \begin{columns}[t]
+    \column{.4\textwidth}
+    \begin{block}{Bid-ask Spread}
+    \begin{itemize}
+        \item Spread is the average of the bid ($b_t$) and ask ($a_t$) prices:
+        \begin{equation}
+            S_t = \frac{1}{2}(a_t + b_t)
+        \end{equation}
+        \item Spread declines over time
+        \item Price Impact of trades causing $S_t$ to increase or decrease
+    \end{itemize}
+    \end{block}
+    
+    \column{.4\textwidth}
+    \begin{block}{Price Impact}
+    \begin{itemize}
+        \item Order Imbalance:
+        \begin{equation}
+            I_t = \frac{V_{t}^{b}}{V_{t}^{b} + V_{t}^{a}}
+        \end{equation}
+        \item Price Impact Regression:
+        \begin{equation}
+            \Delta S_n = \lambda q_n + \varepsilon_n
+        \end{equation}
+        \item Lower $\lambda \rightarrow$ more liquid market, less impact
+    \end{itemize}
+    \end{block}
+\end{columns}
+
+
+\end{frame}
+
+\subsection{Optimal Inventory}
+
+\begin{frame}
+  \frametitle{\hfill Optimal Inventory}
+  \textcite{ho1981optimal} find optimal inventory levels. By optimizing the expected utility of total wealth $E[U(W_T)]$ at time horizon $T$, where 
+  
+\begin{equation}
+    \label{eq:h2}
+    J(t,F,I,Y) = \underset{a,b}{\max}[E[U(W_T)] | t,F,I,Y]
+\end{equation}
+
+It can be shown \parencite{ho1981optimal, o1995market} via stochastic optimization and dynamic programming that the optimal spread is:
+
+\begin{equation}
+    \label{eq:13h}
+    s = \alpha / \beta + (J-SJ)/2SJ_{F}Q + (J-BJ)/2BJ_{F}Q
+\end{equation}
+
+\begin{itemize}
+    \item The spreads depends on the time horizon of the dealer. 
+    \item It can be decomposed in a risk-neutral and risky part.
+    \item The spread is independent of inventory levels.
+\end{itemize}
+
+\end{frame}
+
+%reinforcement learning
+\section{Reinforcement Learning}
+
+\begin{frame}
+  \frametitle{\hfill Reinforcement Learning}
+  \textit{Reinforcement Learning (RL) is learning what to do i.e. map situations to actions to maximize a numerical reward. }
+
+  \begin{block}{}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[scale=.60]{basicRL.png}
+    \caption{Agent interacting via actions ($A_t$) with its environment moving through states ($S_t$). Thus gaining different rewards ($R_t$). Source: \textcite{sutton1998reinforcement}}
+    \label{fig:2}
+\end{figure}
+  \end{block}
+
+\end{frame}
+
+\subsection{DQN \& PPO}
+\begin{frame}
+  \frametitle{\hfill DQN \& PPO}
+  \begin{columns}[t]
+    \column{.4\textwidth}
+    \begin{block}{Deep Q Networks (DQN)}
+    \begin{itemize}
+        \item Replaces \textit{Q-function} with \textit{Q-Network}
+        \item \textit{Experience Replay}
+        \item Implemented in both kerasRL \& tensorforce
+        \item First presented in \textcite{mnih2015human}
+    \end{itemize}
+    \end{block}
+    
+    \column{.4\textwidth}
+    \begin{block}{Policy Gradients \& PPO}
+    \begin{itemize}
+        \item Estimate gradients of policy parameters
+        \item Stochastic gradient descent \& ascent \parencite{schulman2017proximal}
+        \item Also implemented in kerasRL \& tensorforce
+        \item Converges more smoothly in general
+    \end{itemize}
+    \end{block}
+\end{columns}
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Methodology
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Methodology \& Implementation}
+
+\begin{frame}
+  \frametitle{\hfill Methodology}
+
+  \begin{block}{}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[scale=.50]{researchmethodsv3.PNG}
+    \caption{Overview of research methodology}
+    \label{fig:3}
+\end{figure}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{\hfill Implementation}
+
+  \begin{block}{}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[scale=.55]{implementation.png}
+    \caption{Overview of implementation}
+    \label{fig:4}
+\end{figure}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{\hfill Environments}
+
+
+    \begin{table}[H]
+    \centering
+    \caption{Major differences between the environments.}
+    \label{tab:e11}
+    \resizebox{0.90\textwidth}{!}{%
+        \begin{tabular}{llllllllll}
+        Agent & $a_t$  & $\sigma$  & $\lambda$  & Reward  & Offset  & Slope  & $h_t$  & Funds & Inventory  \\ \hline
+         dmv1 & $4$  & $0.2$  & $10$  & sparsed  & $10$  & $-$  &  $10$ & $10^6$ & $1000$ \\
+         dmv2 & $6$  & $1.5$  & $5$  & sparsed & $8$  & $0.5$  & $10$  & $10^6$ & $1000$ \\
+         lobv1& $10$ & $2.0$  & $150$  & shaped & $8$  & $5$  & $10$  & $2\cdot 10^5$ & $200$
+        \end{tabular}%
+        }
+    \end{table}
+    
+    \begin{table}[H]
+    \centering
+    \caption{The different network architectures used.}
+    \label{tab:e1}
+    \resizebox{0.90\textwidth}{!}{%
+        \begin{tabular}{llll}
+         \textbf{Environment} & \textbf{Architecture}  & \textbf{Type}  & \textbf{Library}  \\ \hline
+         \textit{DealerMarket-v1}& 8-layer FCNN  & DQN + Boltzmann  & keras-RL   \\
+         \textit{DealerMarket-v2}& 8-layer FCNN  & PPO + $\varepsilon$ - decay  & tensorforce  \\
+         %\textit{DealerMarket-V2}& ?  & PPO + Self Play  & tensorforce  \\
+         \textit{DealerMarket-v2} & Random model  & Random policy  & tensorforce \\
+         %\textit{LOBMarket-V1} & ?  & PPO + Self-Play  & tensorforce \\ 
+         \textit{LOBMarket-v1} & 6-layer FCNN + 2 LSTM  & PPO + $\varepsilon$ - decay  & tensorforce \\ 
+         \textit{LOBMarket-v1} & Random model  & Random policy  & tensorforce
+        \end{tabular}%
+        }
+    \end{table}
+     
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{\hfill Network Architecture}
+
+  \begin{block}{}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[scale=.40]{nnalob1.png}
+    \caption{Network architecture for LOB agent}
+    \label{fig:5}
+\end{figure}
+  \end{block}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Results
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Results}
+
+\begin{frame}
+  \frametitle{\hfill Results}
+  \begin{table}[H]
+    \centering
+    \caption{Table over rewards for DealerMarket-v1, DealerMarket-v2 and LOBMarket-v1.}
+    \label{tab:dm1}
+    \begin{tabular}{rrrrrr}
+      \hline
+     \textbf{Model} & \textbf{Mean} & \textbf{Std} & \textbf{Max} & \textbf{Min} & \textbf{CI} \\ 
+      \hline
+    DealerMarket-v1 & $391.88$ & $150.47$ & $478.04$ & $-9.43$ & $16.18$ \\
+    DealerMarket-v2 & $22.47$ & $78.46$ & $347.40$ & $-816.11$ & $2.85$  \\
+    LOBMarket-v1& $-5.02$ & $23.88$ & $145.46$ & $-526.77$ & $0.88$ \\ 
+    
+       \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Table over P\&L for DealerMarket-v2 and LOBMarket-v1.}
+    \label{tab:pnl1}
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tabular}{rrrrrr}
+      \hline
+     \textbf{Model} & \textbf{Mean} & \textbf{Std} & \textbf{Max} & \textbf{Min} & \textbf{CI} \\ 
+      \hline
+    DealerMarket-v2 & $-18861.06$ & $540266.01$ & $2220487.97$ & $-1436406.28$ & $19650.46$ \\ 
+    LOBMarket-v1& $-3366.20$ & $60769.67$ & $313634.96$ & $-334806.89$ & $2236.15$ \\ 
+       \hline
+    \end{tabular}%
+}
+\end{table}
+  
+\end{frame}
+
+\subsection{Stylized Facts}
+
+\begin{frame}
+  \frametitle{\hfill Stylized Facts}
+  \begin{figure}[H]
+		%Do not try to scale figure in .tex or you loose font size consistency
+		\centering
+		%The code to input the plot is extremely simple
+		%\input{Imgs/hist_train_sf_dmv1.tex}
+		\includegraphics[scale=.35]{dmv1_sf_multi.png}
+		%Captions and Labels can be used since this is a figure environment
+		\caption{Stylized facts for DealerMarket-v2. Inline with \parencite{cont2001empirical, bouchaud2018trades}}
+		\label{fig:sf1}
+\end{figure}
+  
+\end{frame}
+
+\subsection{ Dealer Agent's Rewards}
+
+\begin{frame}[shrink=10]
+  \frametitle{\hfill Dealer Agent's Rewards}
+  
+  \subsection*{Episode reward vs. random policy}
+    \begin{figure}[H]
+    		%Do not try to scale figure in .tex or you loose font size consistency
+    	    	\centering
+    		%The code to input the plot is extremely simple
+    		\input{Imgs/hist_train_rwd_bench_prese.tex}
+    		%Captions and Labels can be used since this is a figure environment
+    		\caption{ \small Average reward after training DealerMarket-v2.}
+    		\label{fig:dm1}
+    \end{figure}
+  
+\end{frame}
+
+\subsection{ LOB Agent's Rewards}
+
+\begin{frame}[shrink=10]
+  \frametitle{\hfill LOB Agent's Rewards}
+  
+  \subsection*{Episode reward vs. random policy}
+    \begin{figure}[H]
+    		%Do not try to scale figure in .tex or you loose font size consistency
+    	    	\centering
+    		%The code to input the plot is extremely simple
+    		\input{Imgs/hist_train_rwd_lob1_prese.tex}
+    		%Captions and Labels can be used since this is a figure environment
+    		\caption{ \small Average reward after training LOBMarket-v1.}
+    		\label{fig:p1}
+    \end{figure}
+  
+\end{frame}
+
+\subsection{Prices \& Inventory}
+
+\begin{frame}[shrink=10]
+  \frametitle{\hfill Prices \& Inventory}
+   \begin{figure}[H]
+    		%Do not try to scale figure in .tex or you loose font size consistency
+    	    	\centering
+    		%The code to input the plot is extremely simple
+    		\input{Imgs/hist_train_spread_invs_dmv1.tex}
+    		%Captions and Labels can be used since this is a figure environment
+    		\caption{ \small Correlation between prices and inventory for DealerMarket-v2.}
+    		\label{fig:s1}
+    \end{figure}
+  
+\end{frame}
+\subsection{Spread \& Inventory}
+
+\begin{frame}[shrink=10]
+  \frametitle{\hfill Spread \& Inventory}
+   \begin{figure}[H]
+    		%Do not try to scale figure in .tex or you loose font size consistency
+    	    	\centering
+    		%The code to input the plot is extremely simple
+    		\input{Imgs/hist_train_spread_invs2_dmv1.tex}
+    		%Captions and Labels can be used since this is a figure environment
+    		\caption{ \small Correlation between spreads and inventory for DealerMarket-v2.}
+    		\label{fig:dmv12}
+    \end{figure}
+  
+\end{frame}
+
+\subsection{Demo}
+
+\begin{frame}
+  \frametitle{\hfill Demo 1 - Incompetent Dealer agent 84 episodes}
+  
+  \centering
+  \includemedia[width=0.5\linewidth,
+  height=0.5\linewidth,
+  activate=pageopen,
+  passcontext,
+  transparent, 
+  addresource=dmv1ic.mp4,
+flashvars={source=dmv1ic.mp4}
+]{\includegraphics[width=0.6\linewidth]{best_84eps.jpg}}{VPlayer.swf}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{\hfill Demo 2 - More Competent Dealer agent 1169 episodes}
+  
+  \centering
+  \includemedia[width=0.5\linewidth,
+  height=0.5\linewidth,
+  activate=pageopen,
+  passcontext,
+  transparent, 
+  addresource=dmv1lc.mp4,
+flashvars={source=dmv1lc.mp4}
+]{\includegraphics[width=0.6\linewidth]{best_1169eps.jpg}}{VPlayer.swf}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{\hfill Demo 3 - Best Dealer agent 2006 episodes}
+  
+  \centering
+  \includemedia[width=0.5\linewidth,
+  height=0.5\linewidth,
+  activate=pageopen,
+  passcontext,
+  transparent, 
+  addresource=dmv1best.mp4,
+flashvars={source=dmv1best.mp4}
+]{\includegraphics[width=0.6\linewidth]{best_2006eps.jpg}}{VPlayer.swf}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{\hfill Demo 4 - Incompetent LOB agent 20 episodes}
+  
+  \centering
+  \includemedia[width=0.5\linewidth,
+  height=0.5\linewidth,
+  activate=pageopen,
+  passcontext,
+  transparent, 
+  addresource=lobv1ic.mp4,
+flashvars={source=lobv1ic.mp4}
+]{\includegraphics[width=0.6\linewidth]{LOBMarket_eps1_lstm.jpg}}{VPlayer.swf}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{\hfill Demo 5 - Best LOB agent 1869 episodes}
+  
+  \centering
+  \includemedia[width=0.5\linewidth,
+  height=0.5\linewidth,
+  activate=pageopen,
+  passcontext,
+  transparent, 
+  addresource=lobv1best.mp4,
+flashvars={source=lobv1best.mp4}
+]{\includegraphics[width=0.6\linewidth]{LOBMarket_eps1132_lstm.jpg}}{VPlayer.swf}
+  
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Discussion, Analysis & Future studies
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\section{Discussion, Conclusions \& Future Work}
+
+\begin{frame}
+  \frametitle{\hfill Discussion, Conclusions \& Future Work}
+\textit{"Everything has to come to an end, sometime"} - \\   \textbf{L. Frank Baum, The Marvelous Land of Oz}
+  \begin{columns}[t]
+    \column{.4\textwidth}
+    \begin{block}{Conclusions}
+    \begin{itemize}
+        \item Realistic simulations
+        \item DQN \& PPO agents can replicate known trading dynamics
+        \item Reinforcement Learning is suitable for Market Microstructure simulations
+    \end{itemize}
+    \end{block}
+    
+    \column{.4\textwidth}
+    \begin{block}{Future Work}
+    \begin{itemize}
+        \item Look at multiagent framework with competitive self-play
+        \item Test other market structures i.e. Derivatives market
+        \item Train agents on real world historical data
+    \end{itemize}
+    \end{block}
+\end{columns}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\section{References}
+
+\begin{frame}[shrink=35]
+  \frametitle{\hfill References}
+  \printbibliography
+
+\end{frame}
+
+\end{document}
+
